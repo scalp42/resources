@@ -1,0 +1,18 @@
+Download Xcode 3/4 Installer from App Store and run the installer from the applications directory.
+
+== Homebrew
+  /usr/bin/ruby -e "$(curl -fsSL https://raw.github.com/gist/323731)"
+
+== Git
+  brew install git
+  
+== Isolated Rubies
+  bash < <(curl -sk https://rvm.beginrescueend.com/install/rvm)
+  
+== Node.js and coffee-script
+  brew install node
+  curl http://npmjs.org/install.sh | sh
+  npm install -g coffee-script
+
+== Rails
+  gem install rails
