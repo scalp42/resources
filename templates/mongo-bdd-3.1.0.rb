@@ -52,6 +52,7 @@ END
 git :add => "."
 git :commit => "-m \"Initial commit\""
 
+run "bundle install"
 run "rails g rspec:install"
 run "mkdir spec/support spec/models spec/routing"
 run "touch spec/support/.gitkeep spec/models/.gitkeep spec/routing/.gitkeep"
