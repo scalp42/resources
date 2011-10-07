@@ -23,9 +23,10 @@ group :test do
   gem "factory_girl_rails"
   gem "capybara"
   gem "guard-rspec"
-  gem "database_cleaner"
   gem "mongoid-rspec"
+  gem "database_cleaner"
   gem "spork", "~> 0.9.0.rc9"
+  gem "guard-spork"
 end
 END
 
@@ -60,6 +61,8 @@ run "rails g rspec:install"
 run "mkdir spec/support spec/models spec/routing"
 run "touch spec/support/.gitkeep spec/models/.gitkeep spec/routing/.gitkeep"
 run "guard init rspec"
+run "spork --bootstrap"
+run "guard init spork"
 
 git :add => "."
 git :commit => "-m \"Test suite installed\""
