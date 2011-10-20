@@ -1,0 +1,20 @@
+= Intended for Lucid Lynx 64-bit (Ubuntu Lucid 10.04 64-bit)
+* Amazon EC2 AMI ID: ami-cc0e3cb8
+== What the scripts does
+* Sets up minimum required dependencies
+* Builds software with minimum required "addons"
+* Auto tuning for performance based on systems file-descriptors and cpu cores
+* Generates tuned configurations based on systems file-descriptors and cpu cores
+* Sets up init scripts
+* Sets up logrotate
+== Install
+Download resources
+  cd ~/
+  wget https://github.com/RobertBrewitz/resources/tarball/master -O master.tar.gz
+  tar zxvf master.tar.gz
+  cd RobertBrewitz-resources-<release>/servers
+  sudo su
+Run script in foreground with
+  bash rails-3.1.1_thin_nginx.sh
+or in background with
+  nohup bash rails-3.1.1_thin_nginx.sh &
