@@ -46,12 +46,12 @@ if [ ! -n "$SRC_PATH" ]; then
   SRC_PATH="$PREFIX/src"
 fi
 
-if [ ! -n "$MONIT_VERSION" ]; then
-  MONIT_VERSION="5.2.5"
-fi
+#if [ ! -n "$MONIT_VERSION" ]; then
+#  MONIT_VERSION="5.3"
+#fi
 
 if [ ! -n "$NGINX_VERSION" ]; then
-  NGINX_VERSION="1.0.4"
+  NGINX_VERSION="1.0.8"
 fi
 
 if [ ! -n "$NODE_VERSION"]; then
@@ -78,13 +78,20 @@ function banner_echo {
   sleep 2
 }
 
+# Copy resources to SRC_PATH
 cp -rf resources $SRC_PATH/resources
 
 ##
-# System updates
+# System settings and updates
 ##
 
-banner_echo "Updating sources ..."
+banner_echo "Updating locales ..."
+
+locale-gen
+
+banner_echo "... done!"
+
+banner_echo "Updating sources and upgrading system ..."
 
 cat > /etc/apt/sources.list << EOF
 ## main & restricted repositories
@@ -104,30 +111,36 @@ deb http://security.ubuntu.com/ubuntu lucid-security universe
 deb-src http://security.ubuntu.com/ubuntu lucid-security universe
 EOF
 
-banner_echo "... done!"
-banner_echo "Updating system ..."
 apt-get -y update
-banner_echo "... done!"
-banner_echo "Upgrading system ..."
 apt-get -y upgrade
-banner_echo "... done!"
-banner_echo "Updating locales ..."
-locale-gen
+
 banner_echo "... done!"
 
 ##
 # Dependencies
 ##
 
-banner_echo "Installing dependencies ..."
+banner_echo "Installing Ruby $RUBY_VERSION dependencies ..."
 
-aptitude -y install build-essential libpcre3-dev zlib1g-dev git-core flex bison libssl-dev sqlite3 libsqlite3-dev libffi-dev libyaml-dev
+aptitude -y install build-essential zlib1g-dev libffi-dev libyaml-dev pkg-config
 
-# libyaml-dev
-# libffi-dev
-# libyaml libffi openssl
-# --disable-tk, --without-x11
-# --with-out-ext=x11,tk,tcl
+banner_echo "... done!"
+
+banner_echo "Installing passenger-nginx dependencies ..."
+
+aptitude -y install libcurl4-openssl-dev libpcre3-dev
+
+banner_echo "... done!"
+
+#banner_echo "Installing monit dependencies ..."
+#
+#aptitude -y install flex bison
+#
+#banner_echo "... done!"
+
+banner_echo "Installing example rails application dependencies ..."
+
+aptitude -y install sqlite3 sqlite3-dev
 
 banner_echo "... done!"
 
@@ -150,20 +163,20 @@ banner_echo "... done!"
 # Monit
 ##
 
-banner_echo "Installing Monit ..."
-
-# Download and install
-cd $SRC_PATH
-wget http://mmonit.com/monit/dist/monit-$MONIT_VERSION.tar.gz -O $SRC_PATH/monit-$MONIT_VERSION.tar.gz
-tar -zxvf monit-$MONIT_VERSION.tar.gz
-cd monit-$MONIT_VERSION
-./configure --prefix=$PREFIX
-make
-make install
-cd $SRC_PATH
-rm -rf monit-$MONIT_VERSION*
-
-banner_echo "... done!"
+#banner_echo "Installing Monit ..."
+#
+## Download and install
+#cd $SRC_PATH
+#wget http://mmonit.com/monit/dist/monit-$MONIT_VERSION.tar.gz -O $SRC_PATH/monit-$MONIT_VERSION.tar.gz
+#tar -zxvf monit-$MONIT_VERSION.tar.gz
+#cd monit-$MONIT_VERSION
+#./configure --prefix=$PREFIX
+#make
+#make install
+#cd $SRC_PATH
+#rm -rf monit-$MONIT_VERSION*
+#
+#banner_echo "... done!"
 
 ##
 # Nginx
@@ -171,7 +184,6 @@ banner_echo "... done!"
 
 banner_echo "Installing Nginx ..."
 
-# Download and install
 cd $SRC_PATH
 wget http://nginx.org/download/nginx-$NGINX_VERSION.tar.gz -O $SRC_PATH/nginx-$NGINX_VERSION.tar.gz
 tar -zxvf nginx-$NGINX_VERSION.tar.gz
@@ -185,46 +197,47 @@ cd nginx-$NGINX_VERSION
             --lock-path=/var/lock/nginx.lock                  \
             --http-client-body-temp-path=/var/tmp/nginx/body  \
             --http-proxy-temp-path=/var/tmp/nginx/proxy       \
-            --http-fastcgi-temp-path=/var/tmp/nginx/fastcgi   \
-            --with-http_gzip_static_module                    \
             --without-poll_module                             \
             --without-select_module                           \
-            #--without-http                                   \
-            #--without-http_access_module                     \
-            --without-http_autoindex_module                   \
-            --without-http_browser_module                     \
             --without-http_charset_module                     \
             --without-http_empty_gif_module                   \
-            #--without-http_fastcgi_module                    \
-            #--without-http_gzip_module                       \
-            --without-http_limit_zone_module                  \
-            --without-http_map_module                         \
-            #--without-http_memcached_module                  \
-            #--without-http_proxy_module                      \
-            #--without-http_referer_module                    \
-            #--without-http_rewrite_module                    \
-            --without-http_split_clients_module               \
-            --without-http_ssi_module                         \
-            #--without-http_upstream_ip_hash_module           \
-            --without-http_uwsgi_module
+            --without-http_fastcgi_module
 
 make
 make install
 cd $SRC_PATH
 rm -rf nginx-$NGINX_VERSION*
 
-# Directories and init
+banner_echo "... done!"
+
+##
+# Nginx directories
+##
+
+banner_echo "Settings up nginx directories ..."
+
 mkdir -p $PREFIX/sites-available
 mkdir -p $PREFIX/sites-enabled
 mkdir -p /var/tmp/nginx
 mkdir -p /var/tmp/nginx/body
 mkdir -p /var/tmp/nginx/proxy
-mkdir -p /var/tmp/nginx/fastcgi
+
+banner_echo "... done!"
+
+##
+# Nginx init and logrotate
+##
+
+banner_echo "Setting up nginx init and logrotate scripts"
 cp -f resources/init.d/nginx /etc/init.d/nginx
 chmod +x /etc/init.d/nginx
 cp -f resources/logrotate/nginx /etc/logrotate.d/nginx
 
-# Configuration
+##
+# Tuning nginx configuration
+##
+banner_echo "Tuning nginx configuration ..."
+
 cat > $PREFIX/conf/nginx.conf << EOF
 user www-data www-data;
 pid /var/run/nginx.pid;
@@ -276,33 +289,61 @@ EOF
 banner_echo "... done!"
 
 ##
+# Node
+##
+
+banner_echo "Installing Node, NPM and coffee-script ..."
+
+cd $SRC_PATH
+git clone git://github.com/joyent/node.git
+cd node
+git checkout $NODE_VERSION
+./configure --prefix=$PREFIX --dest-cpu=x64
+make -j2
+make install
+cd $SRC_PATH
+rm -rf node
+curl http://npmjs.org/install.sh | clean=no sh
+npm install -g coffee-script
+
+banner_echo "... done!"
+
+##
 # Ruby
 ##
 
-banner_echo "Installing Ruby, Rails, Thin and Bundler ..."
+banner_echo "Installing Ruby $RUBY_VERSION ..."
 
 # Download and install
 cd $SRC_PATH
 wget http://ftp.ruby-lang.org/pub/ruby/1.9/ruby-$RUBY_VERSION.tar.gz -O $SRC_PATH/ruby-$RUBY_VERSION.tar.gz
 tar -zxvf ruby-$RUBY_VERSION.tar.gz
 cd ruby-$RUBY_VERSION
-./configure --prefix=$PREFIX --disable-install-doc
+./configure --prefix=$PREFIX --disable-install-doc --disable-pthread --with-out-ext=tk,win32ole
 make
 make install
-
-# Cleanup
 cd $SRC_PATH
 rm -rf ruby-$RUBY_VERSION*
 
-# Directories
-mkdir -p /var/log/thin
+banner_echo "... done!"
 
-# Gems
+##
+# Gem, thin and rails
+##
+
+banner_echo "Updating gem and installing Thin, bundler and rails ..."
+
 gem update --system
 gem install bundler thin --no-ri --no-rdoc
 gem install rails -v $RAILS_VERSION --no-ri --no-rdoc
 
-# Configuration
+banner_echo "... done!"
+
+##
+# Tuned thin configuration
+##
+banner_echo "Tuning thin configuration ..."
+
 cat > $PREFIX/conf/thin.yml << EOF
 daemonize: true
 socket: /tmp/thin.sock
@@ -315,6 +356,14 @@ timeout: 30
 chdir: /data/www/cloudsalot/production/current
 environment: production
 EOF
+
+banner_echo "... done!"
+
+##
+# Tuning example rails application configuration
+##
+
+banner_echo "Tuning example rails applications nginx configuration ..."
 
 touch $PREFIX/sites-available/cloudsalot
 echo "upstream thin {" >> $PREFIX/sites-available/cloudsalot
@@ -359,33 +408,13 @@ echo "}" >> $PREFIX/sites-available/cloudsalot
 banner_echo "... done!"
 
 ##
-# Node
-##
-
-banner_echo "Installing Node, NPM and coffee-script ..."
-
-cd $SRC_PATH
-git clone git://github.com/joyent/node.git
-cd /usr/local/src/node
-git checkout $NODE_VERSION
-./configure --prefix=$PREFIX --dest-cpu=x64
-make -j2
-make install
-cd $SRC_PATH
-rm -rf node
-curl http://npmjs.org/install.sh | clean=no sh
-npm install -g coffee-script
-
-banner_echo "... done!"
-
-##
 # Data directories
 ##
 
 banner_echo "Setting up directories and example website ..."
 
 # Directories
-mkdir -p /data/db
+mkdir -p /var/log/thin
 mkdir -p /data/www
 mkdir -p /data/www/cloudsalot/production
 
@@ -416,7 +445,8 @@ banner_echo "Installation completed, starting servers ..."
 thin -C /usr/local/conf/thin.yml start
 /etc/init.d/nginx start
 
-banner_echo "Done"
+banner_echo "... done!"
+
 echo ""
 echo "##"
 echo "# Precompile assets in production"
