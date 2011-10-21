@@ -122,13 +122,13 @@ banner_echo "... done!"
 
 banner_echo "Installing Ruby $RUBY_VERSION dependencies ..."
 
-aptitude -y install build-essential zlib1g-dev libffi-dev libyaml-dev pkg-config
+aptitude -y install build-essential zlib1g-dev libffi-dev libyaml-dev # pkg-config # libcurl4-openssl-dev
 
 banner_echo "... done!"
 
-banner_echo "Installing passenger-nginx dependencies ..."
+banner_echo "Installing Nginx dependencies ..."
 
-aptitude -y install libcurl4-openssl-dev libpcre3-dev
+aptitude -y install libpcre3-dev zlib1g-dev
 
 banner_echo "... done!"
 
@@ -140,7 +140,7 @@ banner_echo "... done!"
 
 banner_echo "Installing example rails application dependencies ..."
 
-aptitude -y install sqlite3 sqlite3-dev
+aptitude -y install sqlite3 libsqlite3-dev
 
 banner_echo "... done!"
 
@@ -289,10 +289,10 @@ EOF
 banner_echo "... done!"
 
 ##
-# Node
+# CoffeScript
 ##
 
-banner_echo "Installing Node, NPM and coffee-script ..."
+banner_echo "Installing Node $NODE_VERSION, NPM and coffee-script ..."
 
 cd $SRC_PATH
 git clone git://github.com/joyent/node.git
