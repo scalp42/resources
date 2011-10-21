@@ -111,6 +111,9 @@ banner_echo "... done!"
 banner_echo "Upgrading system ..."
 apt-get -y upgrade
 banner_echo "... done!"
+banner_echo "Updating locales ..."
+locale-gen
+banner_echo "... done!"
 
 ##
 # Dependencies
@@ -118,7 +121,13 @@ banner_echo "... done!"
 
 banner_echo "Installing dependencies ..."
 
-aptitude -y install build-essential libpcre3-dev zlib1g-dev git-core flex bison libssl-dev sqlite3 libsqlite3-dev
+aptitude -y install build-essential libpcre3-dev zlib1g-dev git-core flex bison libssl-dev sqlite3 libsqlite3-dev libffi-dev libyaml-dev
+
+# libyaml-dev
+# libffi-dev
+# libyaml libffi openssl
+# --disable-tk, --without-x11
+# --with-out-ext=x11,tk,tcl
 
 banner_echo "... done!"
 
@@ -267,26 +276,6 @@ EOF
 banner_echo "... done!"
 
 ##
-# Node
-##
-
-banner_echo "Installing Node, NPM and coffee-script ..."
-
-cd $SRC_PATH
-git clone git://github.com/joyent/node.git
-cd /usr/local/src/node
-git checkout $NODE_VERSION
-./configure --prefix=$PREFIX --dest-cpu=x64
-make -j2
-make install
-cd $SRC_PATH
-rm -rf node
-curl http://npmjs.org/install.sh | clean=no sh
-npm install -g coffee-script
-
-banner_echo "... done!"
-
-##
 # Ruby
 ##
 
@@ -297,7 +286,7 @@ cd $SRC_PATH
 wget http://ftp.ruby-lang.org/pub/ruby/1.9/ruby-$RUBY_VERSION.tar.gz -O $SRC_PATH/ruby-$RUBY_VERSION.tar.gz
 tar -zxvf ruby-$RUBY_VERSION.tar.gz
 cd ruby-$RUBY_VERSION
-./configure --prefix=$PREFIX --disable-install-doc --disable-tk --without-x11
+./configure --prefix=$PREFIX --disable-install-doc
 make
 make install
 
@@ -366,6 +355,26 @@ echo "      root html;" >> $PREFIX/sites-available/cloudsalot
 echo "    }" >> $PREFIX/sites-available/cloudsalot
 echo "  }" >> $PREFIX/sites-available/cloudsalot
 echo "}" >> $PREFIX/sites-available/cloudsalot
+
+banner_echo "... done!"
+
+##
+# Node
+##
+
+banner_echo "Installing Node, NPM and coffee-script ..."
+
+cd $SRC_PATH
+git clone git://github.com/joyent/node.git
+cd /usr/local/src/node
+git checkout $NODE_VERSION
+./configure --prefix=$PREFIX --dest-cpu=x64
+make -j2
+make install
+cd $SRC_PATH
+rm -rf node
+curl http://npmjs.org/install.sh | clean=no sh
+npm install -g coffee-script
 
 banner_echo "... done!"
 
