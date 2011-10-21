@@ -75,24 +75,20 @@ function banner_echo {
   echo "# $1"
   echo "##"
   echo ""
-  sleep 2
+  sleep 3
 }
 
 # Copy resources to SRC_PATH
+mkdir -p $SRC_PATH
 cp -rf resources $SRC_PATH/resources
 
 ##
 # System settings and updates
 ##
-
 banner_echo "Updating locales ..."
-
 locale-gen
 
-banner_echo "... done!"
-
 banner_echo "Updating sources and upgrading system ..."
-
 cat > /etc/apt/sources.list << EOF
 ## main & restricted repositories
 deb http://us.archive.ubuntu.com/ubuntu/ lucid main restricted
@@ -114,50 +110,37 @@ EOF
 apt-get -y update
 apt-get -y upgrade
 
-banner_echo "... done!"
-
 ##
 # Dependencies
 ##
-
 banner_echo "Installing Ruby $RUBY_VERSION dependencies ..."
+aptitude -y install build-essential zlib1g-dev libffi-dev libyaml-dev # libcurl4-openssl-dev if curl is needed?
 
-aptitude -y install build-essential zlib1g-dev libffi-dev libyaml-dev # pkg-config # libcurl4-openssl-dev
-
-banner_echo "... done!"
+banner_echo "Installing Git ..."
+aptitude -y install git-core
 
 banner_echo "Installing Nginx dependencies ..."
+aptitude -y install libpcre3-dev libssl-dev # zlib1g-dev already required by Ruby
 
-aptitude -y install libpcre3-dev zlib1g-dev
-
-banner_echo "... done!"
+banner_echo "Installing Node dependencies ..."
+aptitude -y install pkg-config
 
 #banner_echo "Installing monit dependencies ..."
-#
 #aptitude -y install flex bison
-#
-#banner_echo "... done!"
 
 banner_echo "Installing example rails application dependencies ..."
-
 aptitude -y install sqlite3 libsqlite3-dev
-
-banner_echo "... done!"
 
 ##
 # Filedescriptors
 ##
-
 banner_echo "Tuning filedescriptors ..."
-
 cat > /etc/security/limits.conf << EOF
 * soft nofile $system_fd_maxsize
 * hard nofile $system_fd_maxsize
 EOF
 sed -i s/\#define\\t__FD_SETSIZE\\t\\t1024/\#define\\t__FD_SETSIZE\\t\\t$system_fd_maxsize/g /usr/include/bits/typesizes.h
 sed -i s/\#define\\s__FD_SETSIZE\\t1024/\#define\\t__FD_SETSIZE\\t$system_fd_maxsize/g /usr/include/linux/posix_types.h
-
-banner_echo "... done!"
 
 ##
 # Monit
@@ -175,15 +158,11 @@ banner_echo "... done!"
 #make install
 #cd $SRC_PATH
 #rm -rf monit-$MONIT_VERSION*
-#
-#banner_echo "... done!"
 
 ##
 # Nginx
 ##
-
 banner_echo "Installing Nginx ..."
-
 cd $SRC_PATH
 wget http://nginx.org/download/nginx-$NGINX_VERSION.tar.gz -O $SRC_PATH/nginx-$NGINX_VERSION.tar.gz
 tar -zxvf nginx-$NGINX_VERSION.tar.gz
@@ -197,37 +176,31 @@ cd nginx-$NGINX_VERSION
             --lock-path=/var/lock/nginx.lock                  \
             --http-client-body-temp-path=/var/tmp/nginx/body  \
             --http-proxy-temp-path=/var/tmp/nginx/proxy       \
+            --with-http_ssl_module                            \
+            --with-http_gzip_static_module                    \
             --without-poll_module                             \
             --without-select_module                           \
             --without-http_charset_module                     \
             --without-http_empty_gif_module                   \
             --without-http_fastcgi_module
-
 make
 make install
 cd $SRC_PATH
 rm -rf nginx-$NGINX_VERSION*
 
-banner_echo "... done!"
-
 ##
 # Nginx directories
 ##
-
 banner_echo "Settings up nginx directories ..."
-
 mkdir -p $PREFIX/sites-available
 mkdir -p $PREFIX/sites-enabled
 mkdir -p /var/tmp/nginx
 mkdir -p /var/tmp/nginx/body
 mkdir -p /var/tmp/nginx/proxy
 
-banner_echo "... done!"
-
 ##
 # Nginx init and logrotate
 ##
-
 banner_echo "Setting up nginx init and logrotate scripts"
 cp -f resources/init.d/nginx /etc/init.d/nginx
 chmod +x /etc/init.d/nginx
@@ -237,7 +210,6 @@ cp -f resources/logrotate/nginx /etc/logrotate.d/nginx
 # Tuning nginx configuration
 ##
 banner_echo "Tuning nginx configuration ..."
-
 cat > $PREFIX/conf/nginx.conf << EOF
 user www-data www-data;
 pid /var/run/nginx.pid;
@@ -286,35 +258,39 @@ http {
 }
 EOF
 
-banner_echo "... done!"
-
 ##
 # CoffeScript
 ##
-
-banner_echo "Installing Node $NODE_VERSION, NPM and coffee-script ..."
-
+banner_echo "Installing Node $NODE_VERSION, Node Package Manager and CoffeScript ..."
 cd $SRC_PATH
 git clone git://github.com/joyent/node.git
 cd node
 git checkout $NODE_VERSION
 ./configure --prefix=$PREFIX --dest-cpu=x64
-make -j2
+##
+# Not sure if case will be proper here on virtual machines
+# case $system_cores in
+#   1)
+#     make -j1
+#     ;;
+#   [2-3])
+#     make -j2
+#     ;;
+#   *)
+#     make -j4
+#     ;;
+# esac
+make
 make install
 cd $SRC_PATH
 rm -rf node
 curl http://npmjs.org/install.sh | clean=no sh
 npm install -g coffee-script
 
-banner_echo "... done!"
-
 ##
 # Ruby
 ##
-
 banner_echo "Installing Ruby $RUBY_VERSION ..."
-
-# Download and install
 cd $SRC_PATH
 wget http://ftp.ruby-lang.org/pub/ruby/1.9/ruby-$RUBY_VERSION.tar.gz -O $SRC_PATH/ruby-$RUBY_VERSION.tar.gz
 tar -zxvf ruby-$RUBY_VERSION.tar.gz
@@ -325,25 +301,18 @@ make install
 cd $SRC_PATH
 rm -rf ruby-$RUBY_VERSION*
 
-banner_echo "... done!"
-
 ##
 # Gem, thin and rails
 ##
-
 banner_echo "Updating gem and installing Thin, bundler and rails ..."
-
 gem update --system
 gem install bundler thin --no-ri --no-rdoc
 gem install rails -v $RAILS_VERSION --no-ri --no-rdoc
-
-banner_echo "... done!"
 
 ##
 # Tuned thin configuration
 ##
 banner_echo "Tuning thin configuration ..."
-
 cat > $PREFIX/conf/thin.yml << EOF
 daemonize: true
 socket: /tmp/thin.sock
@@ -357,14 +326,10 @@ chdir: /data/www/cloudsalot/production/current
 environment: production
 EOF
 
-banner_echo "... done!"
-
 ##
 # Tuning example rails application configuration
 ##
-
 banner_echo "Tuning example rails applications nginx configuration ..."
-
 touch $PREFIX/sites-available/cloudsalot
 echo "upstream thin {" >> $PREFIX/sites-available/cloudsalot
 for i in `seq 1 $system_cores`;
@@ -405,27 +370,19 @@ echo "    }" >> $PREFIX/sites-available/cloudsalot
 echo "  }" >> $PREFIX/sites-available/cloudsalot
 echo "}" >> $PREFIX/sites-available/cloudsalot
 
-banner_echo "... done!"
-
 ##
 # Data directories
 ##
-
-banner_echo "Setting up directories and example website ..."
-
-# Directories
+banner_echo "Setting up directories ..."
 mkdir -p /var/log/thin
 mkdir -p /data/www
 mkdir -p /data/www/cloudsalot/production
-
-# Permissions
 chown -R ubuntu:ubuntu /data/www
 chmod 775 /data/www
-
-# Symlinks
 ln -s /data/www /www
 ln -s /data/www /var/www
 
+banner_echo "Setting up rails example application ..."
 # Rails application
 cd /data/www/cloudsalot/production
 rails new current
@@ -434,18 +391,12 @@ RAILS_ENV=production bundle exec rake assets:precompile
 cd $SRC_PATH
 ln -s $PREFIX/sites-available/cloudsalot $PREFIX/sites-enabled/cloudsalot
 
+banner_echo "Cleaning up installation files ..."
 # Cleanup
 cd $SRC_PATH
 rm -rf resources
 
-banner_echo "... done!"
-
-banner_echo "Installation completed, starting servers ..."
-
-thin -C /usr/local/conf/thin.yml start
-/etc/init.d/nginx start
-
-banner_echo "... done!"
+banner_echo "... installation completed!"
 
 echo ""
 echo "##"
