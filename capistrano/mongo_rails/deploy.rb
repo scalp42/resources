@@ -25,5 +25,5 @@ end
 after "bundle_deployment", :precompile_assets
 desc "Precompiles assets"
 task :precompile_assets, role: :app do
-  run "cd #{release_path} && RAILS_ENV=#{rails_env} bundle exec rake assets:precompile"
+  run "cd #{release_path} && RAILS_ENV=#{stage} bundle exec rake assets:precompile"
 end
