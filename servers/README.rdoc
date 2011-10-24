@@ -15,6 +15,6 @@ Download resources
   cd RobertBrewitz-resources-<release>/servers
   sudo su
 Run script in foreground with
-  bash rails-3.1.1_thin_nginx.sh
+  bash nginx_ruby_node_monit.sh
 or in background with
-  nohup bash rails-3.1.1_thin_nginx.sh &
+  nohup bash nginx_ruby_node_monit.sh &

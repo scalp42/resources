@@ -2,17 +2,12 @@
 
 ##
 # Installation with auto tuning of filedescriptors with:
+# - Git
 # - Monit
 # - Nginx
-# - Git
-# - Node
-# - NPM
-# - CoffeeScript
+# - Node, NPM and CoffeeScript
 # - Ruby
-# - Rails
 # - Bundler
-# - Thin
-# - Basic application in a capistrano'ish structure
 ##
 
 ##
@@ -60,10 +55,6 @@ fi
 
 if [ ! -n "$RUBY_VERSION" ]; then
   RUBY_VERSION="1.9.2-p290"
-fi
-
-if [ ! -n "$RAILS_VERSION" ]; then
-  RAILS_VERSION="3.1.1"
 fi
 
 system_fd_maxsize=$(more /proc/sys/fs/file-max*)
@@ -292,6 +283,7 @@ make
 make install
 cd $SRC_PATH
 rm -rf ruby-$RUBY_VERSION*
+gem install bundler --no-ri --no-rdoc
 
 ##
 # Tuned thin configuration
@@ -312,9 +304,9 @@ environment: production
 EOF
 
 ##
-# Tuning example rails application configuration
+# Tuning example application configuration
 ##
-banner_echo "Tuning example rails applications nginx configuration ..."
+banner_echo "Tuning example applications nginx configuration ..."
 touch $PREFIX/sites-available/site.conf.example
 echo "upstream thin {" >> $PREFIX/sites-available/site.conf.example
 for i in `seq 1 $system_cores`;
