@@ -7,7 +7,7 @@ Set up applciation directories
 Deploy to staging
   cap staging deploy:update
 == Deployment production
-Deploy to production
-  cap production deploy:update
 Set up applciation directories
   cap production deploy:setup
+Deploy to production
+  cap production deploy:update
