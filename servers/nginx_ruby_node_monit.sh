@@ -109,11 +109,11 @@ apt-get -y upgrade
 # Dependencies
 ##
 banner_echo "Installing Ruby $RUBY_VERSION dependencies ..."
-aptitude -y install build-essential zlib1g-dev \
+aptitude -y install build-essential zlib1g-dev libxml2-dev libxslt-dev \
                     libffi-dev libyaml-dev \
                     libcurl4-openssl-dev libopenssl-ruby \
                     ncurses-dev libncurses-ruby \
-                    libreadline-dev libreadline-ruby
+                    libreadline-dev libreadline-ruby \
 
 banner_echo "Installing Git ..."
 aptitude -y install git-core
@@ -126,6 +126,9 @@ aptitude -y install pkg-config
 
 banner_echo "Installing monit dependencies ..."
 aptitude -y install flex bison
+
+banner_echo "Installing Imagemagick and dependencies ..."
+aptitude -y install libmagickwand-dev imagemagick
 
 ##
 # Filedescriptors
