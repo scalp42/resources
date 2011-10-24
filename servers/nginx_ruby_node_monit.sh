@@ -201,7 +201,7 @@ mkdir -p /var/tmp/nginx/proxy
 ##
 # Nginx init and logrotate
 ##
-banner_echo "Setting up nginx init and logrotate scripts"
+banner_echo "Setting up nginx init and logrotate scripts ..."
 cp -f resources/init.d/nginx /etc/init.d/nginx
 chmod +x /etc/init.d/nginx
 cp -f resources/logrotate/nginx /etc/logrotate.d/nginx
