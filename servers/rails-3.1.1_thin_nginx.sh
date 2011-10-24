@@ -118,7 +118,11 @@ apt-get -y upgrade
 # Dependencies
 ##
 banner_echo "Installing Ruby $RUBY_VERSION dependencies ..."
-aptitude -y install build-essential zlib1g-dev libffi-dev libyaml-dev ibcurl4-openssl-dev
+aptitude -y install build-essential zlib1g-dev \
+                    libffi-dev libyaml-dev \
+                    libcurl4-openssl-dev libopenssl-ruby \
+                    ncurses-dev libncurses-ruby \
+                    libreadline-dev libreadline-ruby
 
 banner_echo "Installing Git ..."
 aptitude -y install git-core
@@ -276,34 +280,6 @@ curl http://npmjs.org/install.sh | sh
 npm install -g coffee-script
 
 ##
-# Readline
-##
-banner_echo "Installing readline 6.2 for Ruby $RUBY_VERSION ..."
-cd $SRC_PATH
-wget ftp://ftp.cwru.edu/pub/bash/readline-6.2.tar.gz -O $SRC_PATH/readline-6.2.tar.gz
-tar -zxvf readline-6.2.tar.gz
-cd readline-6.2
-./configure --prefix=$PREFIX
-make
-make install
-cd $SRC_PATH
-rm -rf readline-6.2*
-
-##
-# Ncurses
-##
-banner_echo "Installing ncurses 5.9 for Ruby $RUBY_VERSION ..."
-cd $SRC_PATH
-wget http://ftp.gnu.org/pub/gnu/ncurses/ncurses-5.9.tar.gz -O $SRC_PATH/ncurses-5.9.tar.gz
-tar -zxvf ncurses-5.9.tar.gz
-cd ncurses-5.9
-./configure --prefix=$PREFIX
-make
-make install
-cd $SRC_PATH
-rm -rf ncurses-5.9*
-
-##
 # Ruby
 ##
 banner_echo "Installing Ruby $RUBY_VERSION ..."
@@ -311,7 +287,7 @@ cd $SRC_PATH
 wget http://ftp.ruby-lang.org/pub/ruby/1.9/ruby-$RUBY_VERSION.tar.gz -O $SRC_PATH/ruby-$RUBY_VERSION.tar.gz
 tar -zxvf ruby-$RUBY_VERSION.tar.gz
 cd ruby-$RUBY_VERSION
-./configure --prefix=$PREFIX --disable-install-doc --disable-pthread --with-out-ext=tk,win32ole --with-readline-dir=/usr/local/lib --with-readline-dir=/usr/local/lib
+./configure --prefix=$PREFIX --disable-install-doc --disable-pthread --with-out-ext=tk,win32ole # --with-readline-dir=/lib --with-ncurses-dir=/lib
 make
 make install
 cd $SRC_PATH
@@ -320,8 +296,9 @@ rm -rf ruby-$RUBY_VERSION*
 ##
 # Tuned thin configuration
 ##
+mkdir -p /var/log/thin
 banner_echo "Tuning thin configuration ..."
-cat > $PREFIX/conf/thin.example.yml << EOF
+cat > $PREFIX/conf/thin.yml.example << EOF
 daemonize: true
 socket: /tmp/thin.sock
 pid: /var/run/thin.pid
@@ -382,16 +359,16 @@ echo "}" >> $PREFIX/sites-available/site.conf.example
 # Data directories
 ##
 banner_echo "Setting up directories ..."
-mkdir -p /var/log/thin
 mkdir -p /data/www
-mkdir -p /data/www/cloudsalot/production
 chown -R ubuntu:ubuntu /data/www
 chmod 775 /data/www
 ln -s /data/www /www
 ln -s /data/www /var/www
 
-banner_echo "Cleaning up installation files ..."
+##
 # Cleanup
+##
+banner_echo "Cleaning up installation files ..."
 cd $SRC_PATH
 rm -rf resources
 
