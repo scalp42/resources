@@ -87,6 +87,10 @@ cp -rf resources $SRC_PATH/resources
 ##
 banner_echo "Updating locales ..."
 locale-gen
+LC_CTYPE="en_GB.UTF-8"
+LC_ALL="en_GB.UTF-8"
+LANGUAGE="en_GB.UTF-8"
+LANG="en_GB.UTF-8"
 
 banner_echo "Updating sources and upgrading system ..."
 cat > /etc/apt/sources.list << EOF
@@ -114,7 +118,7 @@ apt-get -y upgrade
 # Dependencies
 ##
 banner_echo "Installing Ruby $RUBY_VERSION dependencies ..."
-aptitude -y install build-essential zlib1g-dev libffi-dev libyaml-dev # libcurl4-openssl-dev if curl is needed?
+aptitude -y install build-essential zlib1g-dev libffi-dev libyaml-dev ibcurl4-openssl-dev
 
 banner_echo "Installing Git ..."
 aptitude -y install git-core
@@ -182,7 +186,7 @@ cd nginx-$NGINX_VERSION
             --without-select_module                           \
             --without-http_charset_module                     \
             --without-http_empty_gif_module                   \
-            --without-http_fastcgi_module
+            --without-fastcgi_module
 make
 make install
 cd $SRC_PATH
@@ -239,7 +243,7 @@ http {
   variables_hash_bucket_size 256;
   variables_hash_max_size    2048;
   
-  log_format            gzip '[$status @ $time_local <$bytes_sent:$gzip_ratio>] $request from $http_referer by $http_user_agent';
+  log_format            gzip '[\$status @ \$time_local <\$bytes_sent:\$gzip_ratio>] \$request from \$http_referer by \$http_user_agent';
   access_log            /var/log/nginx/access.log gzip buffer=32k;
   error_log             /var/log/nginx/error.log crit buffer=32k;
   
@@ -288,6 +292,33 @@ curl http://npmjs.org/install.sh | clean=no sh
 npm install -g coffee-script
 
 ##
+# Readline
+##
+banner_echo "Installing readline 6.2 for Ruby $RUBY_VERSION ..."
+cd $SRC_PATH
+wget ftp://ftp.cwru.edu/pub/bash/readline-6.2.tar.gz -O $SRC_PATH/readline-6.2.tar.gz
+tar -zxvf readline-6.2.tar.gz
+cd readline-6.2
+./configure --prefix=$PREFIX
+make
+make install
+cd $SRC_PATH
+rm -rf readline-6.2*
+
+##
+# Ncurses
+##
+cd $SRC_PATH
+wget http://ftp.gnu.org/pub/gnu/ncurses/ncurses-5.9.tar.gz -O $SRC_PATH/ncurses-5.9.tar.gz
+tar -zxvf ncurses-5.9.tar.gz
+cd ncurses-5.9
+./configure --prefix=$PREFIX
+make
+make install
+cd $SRC_PATH
+rm -rf ncurses-5.9*
+
+##
 # Ruby
 ##
 banner_echo "Installing Ruby $RUBY_VERSION ..."
@@ -321,7 +352,7 @@ log: /var/log/thin/thin.log
 servers: $system_cores
 max_conns: $(($system_fd_maxsize / $system_cores))
 max_persistent_conns: 512
-timeout: 30
+timeout: 60
 chdir: /data/www/cloudsalot/production/current
 environment: production
 EOF
@@ -334,7 +365,7 @@ touch $PREFIX/sites-available/cloudsalot
 echo "upstream thin {" >> $PREFIX/sites-available/cloudsalot
 for i in `seq 1 $system_cores`;
 do
-  echo "  server unix:/var/run/thin.$(($i-1)).sock;" >> $PREFIX/sites-available/cloudsalot
+  echo "  server unix:/tmp/thin.$(($i-1)).sock;" >> $PREFIX/sites-available/cloudsalot
 done
 echo "}" >> $PREFIX/sites-available/cloudsalot
 echo "" >> $PREFIX/sites-available/cloudsalot
