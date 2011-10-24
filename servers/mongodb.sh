@@ -46,6 +46,8 @@ if [ ! -n "$MONGODB_VERSION" ]; then
   MONGODB_VERSION="r2.0.1"
 fi
 
+system_fd_maxsize=$(more /proc/sys/fs/file-max*)
+
 function banner_echo {
   echo ""
   echo "##"
@@ -55,7 +57,9 @@ function banner_echo {
   sleep 3
 }
 
-system_fd_maxsize=$(more /proc/sys/fs/file-max*)
+# Copy resources to SRC_PATH
+mkdir -p $SRC_PATH
+cp -rf resources $SRC_PATH/resources
 
 ##
 # System settings and updates
