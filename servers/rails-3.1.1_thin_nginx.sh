@@ -46,9 +46,9 @@ if [ ! -n "$SRC_PATH" ]; then
   SRC_PATH="$PREFIX/src"
 fi
 
-#if [ ! -n "$MONIT_VERSION" ]; then
-#  MONIT_VERSION="5.3"
-#fi
+if [ ! -n "$MONIT_VERSION" ]; then
+  MONIT_VERSION="5.3"
+fi
 
 if [ ! -n "$NGINX_VERSION" ]; then
   NGINX_VERSION="1.0.8"
@@ -129,11 +129,8 @@ aptitude -y install libpcre3-dev libssl-dev # zlib1g-dev already required by Rub
 banner_echo "Installing Node dependencies ..."
 aptitude -y install pkg-config
 
-#banner_echo "Installing monit dependencies ..."
-#aptitude -y install flex bison
-
-banner_echo "Installing example rails application dependencies ..."
-aptitude -y install sqlite3 libsqlite3-dev
+banner_echo "Installing monit dependencies ..."
+aptitude -y install flex bison
 
 ##
 # Filedescriptors
@@ -150,18 +147,18 @@ sed -i s/\#define\\s__FD_SETSIZE\\t1024/\#define\\t__FD_SETSIZE\\t$system_fd_max
 # Monit
 ##
 
-#banner_echo "Installing Monit ..."
-#
-## Download and install
-#cd $SRC_PATH
-#wget http://mmonit.com/monit/dist/monit-$MONIT_VERSION.tar.gz -O $SRC_PATH/monit-$MONIT_VERSION.tar.gz
-#tar -zxvf monit-$MONIT_VERSION.tar.gz
-#cd monit-$MONIT_VERSION
-#./configure --prefix=$PREFIX
-#make
-#make install
-#cd $SRC_PATH
-#rm -rf monit-$MONIT_VERSION*
+banner_echo "Installing Monit ..."
+
+# Download and install
+cd $SRC_PATH
+wget http://mmonit.com/monit/dist/monit-$MONIT_VERSION.tar.gz -O $SRC_PATH/monit-$MONIT_VERSION.tar.gz
+tar -zxvf monit-$MONIT_VERSION.tar.gz
+cd monit-$MONIT_VERSION
+./configure --prefix=$PREFIX
+make
+make install
+cd $SRC_PATH
+rm -rf monit-$MONIT_VERSION*
 
 ##
 # Nginx
@@ -186,7 +183,7 @@ cd nginx-$NGINX_VERSION
             --without-select_module                           \
             --without-http_charset_module                     \
             --without-http_empty_gif_module                   \
-            --without-fastcgi_module
+            --without-http_fastcgi_module
 make
 make install
 cd $SRC_PATH
@@ -271,24 +268,11 @@ git clone git://github.com/joyent/node.git
 cd node
 git checkout $NODE_VERSION
 ./configure --prefix=$PREFIX --dest-cpu=x64
-##
-# Not sure if case will be proper here on virtual machines
-# case $system_cores in
-#   1)
-#     make -j1
-#     ;;
-#   [2-3])
-#     make -j2
-#     ;;
-#   *)
-#     make -j4
-#     ;;
-# esac
 make
 make install
 cd $SRC_PATH
 rm -rf node
-curl http://npmjs.org/install.sh | clean=no sh
+curl http://npmjs.org/install.sh | sh
 npm install -g coffee-script
 
 ##
@@ -308,6 +292,7 @@ rm -rf readline-6.2*
 ##
 # Ncurses
 ##
+banner_echo "Installing ncurses 5.9 for Ruby $RUBY_VERSION ..."
 cd $SRC_PATH
 wget http://ftp.gnu.org/pub/gnu/ncurses/ncurses-5.9.tar.gz -O $SRC_PATH/ncurses-5.9.tar.gz
 tar -zxvf ncurses-5.9.tar.gz
@@ -326,25 +311,17 @@ cd $SRC_PATH
 wget http://ftp.ruby-lang.org/pub/ruby/1.9/ruby-$RUBY_VERSION.tar.gz -O $SRC_PATH/ruby-$RUBY_VERSION.tar.gz
 tar -zxvf ruby-$RUBY_VERSION.tar.gz
 cd ruby-$RUBY_VERSION
-./configure --prefix=$PREFIX --disable-install-doc --disable-pthread --with-out-ext=tk,win32ole
+./configure --prefix=$PREFIX --disable-install-doc --disable-pthread --with-out-ext=tk,win32ole --with-readline-dir=/usr/local/lib --with-readline-dir=/usr/local/lib
 make
 make install
 cd $SRC_PATH
 rm -rf ruby-$RUBY_VERSION*
 
 ##
-# Gem, thin and rails
-##
-banner_echo "Updating gem and installing Thin, bundler and rails ..."
-gem update --system
-gem install bundler thin --no-ri --no-rdoc
-gem install rails -v $RAILS_VERSION --no-ri --no-rdoc
-
-##
 # Tuned thin configuration
 ##
 banner_echo "Tuning thin configuration ..."
-cat > $PREFIX/conf/thin.yml << EOF
+cat > $PREFIX/conf/thin.example.yml << EOF
 daemonize: true
 socket: /tmp/thin.sock
 pid: /var/run/thin.pid
@@ -353,7 +330,7 @@ servers: $system_cores
 max_conns: $(($system_fd_maxsize / $system_cores))
 max_persistent_conns: 512
 timeout: 60
-chdir: /data/www/cloudsalot/production/current
+chdir: /data/www/application/production/current
 environment: production
 EOF
 
@@ -361,45 +338,45 @@ EOF
 # Tuning example rails application configuration
 ##
 banner_echo "Tuning example rails applications nginx configuration ..."
-touch $PREFIX/sites-available/cloudsalot
-echo "upstream thin {" >> $PREFIX/sites-available/cloudsalot
+touch $PREFIX/sites-available/site.conf.example
+echo "upstream thin {" >> $PREFIX/sites-available/site.conf.example
 for i in `seq 1 $system_cores`;
 do
-  echo "  server unix:/tmp/thin.$(($i-1)).sock;" >> $PREFIX/sites-available/cloudsalot
+  echo "  server unix:/tmp/thin.$(($i-1)).sock;" >> $PREFIX/sites-available/site.conf.example
 done
-echo "}" >> $PREFIX/sites-available/cloudsalot
-echo "" >> $PREFIX/sites-available/cloudsalot
-echo "server {" >> $PREFIX/sites-available/cloudsalot
-echo "  listen      80;" >> $PREFIX/sites-available/cloudsalot
-echo "  server_name localhost;" >> $PREFIX/sites-available/cloudsalot
-echo "  root        /data/www/cloudsalot/production/current/public;" >> $PREFIX/sites-available/cloudsalot
-echo "  " >> $PREFIX/sites-available/cloudsalot
-echo "  location / {" >> $PREFIX/sites-available/cloudsalot
-echo "    proxy_set_header X-Real-IP \$remote_addr;" >> $PREFIX/sites-available/cloudsalot
-echo "    proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;" >> $PREFIX/sites-available/cloudsalot
-echo "    proxy_set_header Host \$http_host;" >> $PREFIX/sites-available/cloudsalot
-echo "    proxy_redirect   off;" >> $PREFIX/sites-available/cloudsalot
-echo "    " >> $PREFIX/sites-available/cloudsalot
-echo "    if (-f \$request_filename/index.html) {" >> $PREFIX/sites-available/cloudsalot
-echo "      rewrite (.*) \$1/index.html break;" >> $PREFIX/sites-available/cloudsalot
-echo "    }" >> $PREFIX/sites-available/cloudsalot
-echo "    " >> $PREFIX/sites-available/cloudsalot
-echo "    if (-f \$request_filename.html) {" >> $PREFIX/sites-available/cloudsalot
-echo "      rewrite (.*) \$1.html break;" >> $PREFIX/sites-available/cloudsalot
-echo "    }" >> $PREFIX/sites-available/cloudsalot
-echo "    " >> $PREFIX/sites-available/cloudsalot
-echo "    if (!-f \$request_filename) {" >> $PREFIX/sites-available/cloudsalot
-echo "      proxy_pass http://thin;" >> $PREFIX/sites-available/cloudsalot
-echo "      break;" >> $PREFIX/sites-available/cloudsalot
-echo "    }" >> $PREFIX/sites-available/cloudsalot
-echo "    " >> $PREFIX/sites-available/cloudsalot
-echo "    error_page 500 502 503 504 /50x.html;" >> $PREFIX/sites-available/cloudsalot
-echo "    " >> $PREFIX/sites-available/cloudsalot
-echo "    location = /50x.html {" >> $PREFIX/sites-available/cloudsalot
-echo "      root html;" >> $PREFIX/sites-available/cloudsalot
-echo "    }" >> $PREFIX/sites-available/cloudsalot
-echo "  }" >> $PREFIX/sites-available/cloudsalot
-echo "}" >> $PREFIX/sites-available/cloudsalot
+echo "}" >> $PREFIX/sites-available/site.conf.example
+echo "" >> $PREFIX/sites-available/site.conf.example
+echo "server {" >> $PREFIX/sites-available/site.conf.example
+echo "  listen      80;" >> $PREFIX/sites-available/site.conf.example
+echo "  server_name localhost;" >> $PREFIX/sites-available/site.conf.example
+echo "  root        /data/www/cloudsalot/production/current/public;" >> $PREFIX/sites-available/site.conf.example
+echo "  " >> $PREFIX/sites-available/site.conf.example
+echo "  location / {" >> $PREFIX/sites-available/site.conf.example
+echo "    proxy_set_header X-Real-IP \$remote_addr;" >> $PREFIX/sites-available/site.conf.example
+echo "    proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;" >> $PREFIX/sites-available/site.conf.example
+echo "    proxy_set_header Host \$http_host;" >> $PREFIX/sites-available/site.conf.example
+echo "    proxy_redirect   off;" >> $PREFIX/sites-available/site.conf.example
+echo "    " >> $PREFIX/sites-available/site.conf.example
+echo "    if (-f \$request_filename/index.html) {" >> $PREFIX/sites-available/site.conf.example
+echo "      rewrite (.*) \$1/index.html break;" >> $PREFIX/sites-available/site.conf.example
+echo "    }" >> $PREFIX/sites-available/site.conf.example
+echo "    " >> $PREFIX/sites-available/site.conf.example
+echo "    if (-f \$request_filename.html) {" >> $PREFIX/sites-available/site.conf.example
+echo "      rewrite (.*) \$1.html break;" >> $PREFIX/sites-available/site.conf.example
+echo "    }" >> $PREFIX/sites-available/site.conf.example
+echo "    " >> $PREFIX/sites-available/site.conf.example
+echo "    if (!-f \$request_filename) {" >> $PREFIX/sites-available/site.conf.example
+echo "      proxy_pass http://thin;" >> $PREFIX/sites-available/site.conf.example
+echo "      break;" >> $PREFIX/sites-available/site.conf.example
+echo "    }" >> $PREFIX/sites-available/site.conf.example
+echo "    " >> $PREFIX/sites-available/site.conf.example
+echo "    error_page 500 502 503 504 /50x.html;" >> $PREFIX/sites-available/site.conf.example
+echo "    " >> $PREFIX/sites-available/site.conf.example
+echo "    location = /50x.html {" >> $PREFIX/sites-available/site.conf.example
+echo "      root html;" >> $PREFIX/sites-available/site.conf.example
+echo "    }" >> $PREFIX/sites-available/site.conf.example
+echo "  }" >> $PREFIX/sites-available/site.conf.example
+echo "}" >> $PREFIX/sites-available/site.conf.example
 
 ##
 # Data directories
@@ -412,15 +389,6 @@ chown -R ubuntu:ubuntu /data/www
 chmod 775 /data/www
 ln -s /data/www /www
 ln -s /data/www /var/www
-
-banner_echo "Setting up rails example application ..."
-# Rails application
-cd /data/www/cloudsalot/production
-rails new current
-cd /data/www/cloudsalot/production/current
-RAILS_ENV=production bundle exec rake assets:precompile
-cd $SRC_PATH
-ln -s $PREFIX/sites-available/cloudsalot $PREFIX/sites-enabled/cloudsalot
 
 banner_echo "Cleaning up installation files ..."
 # Cleanup
