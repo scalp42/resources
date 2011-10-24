@@ -14,7 +14,13 @@ Download resources
   tar zxvf master.tar.gz
   cd RobertBrewitz-resources-<release>/servers
   sudo su
+=== Nginx_ruby_node_monit
 Run script in foreground with
   bash nginx_ruby_node_monit.sh
 or in background with
   nohup bash nginx_ruby_node_monit.sh &
+=== MongoDB
+Run script in foreground with
+  bash mongodb.sh
+or in background with
+  nohup bash mongodb.sh &

@@ -43,11 +43,8 @@ if [ ! -n "$SRC_PATH" ]; then
 fi
 
 if [ ! -n "$MONGODB_VERSION" ]; then
-  MONGODB_VERSION="1.8.1"
+  MONGODB_VERSION="r2.0.1"
 fi
-
-system_fd_maxsize=$(more /proc/sys/fs/file-max*)
-system_cores=$(cat /proc/cpuinfo | grep processor | wc -l)
 
 function banner_echo {
   echo ""
@@ -97,6 +94,17 @@ banner_echo "Installing MongoDB dependencies ..."
 aptitude -y build-dep firefox
 aptitude -y install mercurial libasound2-dev libcurl4-openssl-dev libnotify-dev libxt-dev libiw-dev mesa-common-dev autoconf2.13 yasm
 aptitude -y install tcsh git-core scons g++ libpcre++-dev libboost-dev libreadline-dev xulrunner-1.9.2-dev install libboost-program-options-dev libboost-thread-dev libboost-filesystem-dev libboost-date-time-dev
+
+##
+# Filedescriptors
+##
+banner_echo "Tuning filedescriptors ..."
+cat > /etc/security/limits.conf << EOF
+* soft nofile $system_fd_maxsize
+* hard nofile $system_fd_maxsize
+EOF
+sed -i s/\#define\\t__FD_SETSIZE\\t\\t1024/\#define\\t__FD_SETSIZE\\t\\t$system_fd_maxsize/g /usr/include/bits/typesizes.h
+sed -i s/\#define\\s__FD_SETSIZE\\t1024/\#define\\t__FD_SETSIZE\\t$system_fd_maxsize/g /usr/include/linux/posix_types.h
 
 ##
 # MongoDB
