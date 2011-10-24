@@ -2,13 +2,8 @@
 
 ##
 # Installation with auto tuning of filedescriptors with:
-# - Git
-# - Imagemagick
-# - Monit
-# - Nginx
-# - Node, NPM and CoffeeScript
-# - Ruby
-# - Bundler
+# - SpiderMonkey patch
+# - MongoDB 2.0.1
 ##
 
 ##
@@ -113,9 +108,24 @@ sed -i s/\#define\\t__FD_SETSIZE\\t\\t1024/\#define\\t__FD_SETSIZE\\t\\t$system_
 sed -i s/\#define\\s__FD_SETSIZE\\t1024/\#define\\t__FD_SETSIZE\\t$system_fd_maxsize/g /usr/include/linux/posix_types.h
 
 ##
+# MongoDB prequisits
+##
+banner_echo "Fixing MongoDB $MONGO_VERSION dependencies (currently required for 2.0.0)..."
+cd $SRC_PATH
+aptitude -y remove xulrunner-1.9.2-dev xulrunner-1.9.2
+wget ftp://ftp.mozilla.org/pub/mozilla.org/js/js-1.7.0.tar.gz -O $SRC_PATH/js-1.7.0.tar.gz
+tar zxvf js-1.7.0.tar.gz
+cd js/src
+export CFLAGS="-DJS_C_STRINGS_ARE_UTF8"
+make -f Makefile.ref
+JS_DIST=$PREFIX make -f Makefile.ref export
+cd $SRC_PATH
+rm -rf js*
+
+##
 # MongoDB
 ##
-banner_echo "Installing MongoDB ..."
+banner_echo "Installing MongoDB $MONGO_VERSION ..."
 cd $SRC_PATH
 git clone git://github.com/mongodb/mongo.git
 cd mongo

@@ -1,4 +1,4 @@
-#!/bin/sh
+#! /bin/sh
 
 ##
 # Modified 24th of October 2011 by Robert Brewitz for CloudsAlot adaption
