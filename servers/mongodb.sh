@@ -55,6 +55,8 @@ function banner_echo {
   sleep 3
 }
 
+system_fd_maxsize=$(more /proc/sys/fs/file-max*)
+
 ##
 # System settings and updates
 ##
