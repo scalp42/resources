@@ -113,7 +113,7 @@ aptitude -y install build-essential zlib1g-dev libxml2-dev libxslt-dev \
                     libffi-dev libyaml-dev \
                     libcurl4-openssl-dev libopenssl-ruby \
                     ncurses-dev libncurses-ruby \
-                    libreadline-dev libreadline-ruby \
+                    libreadline-dev libreadline-ruby
 
 banner_echo "Installing Git ..."
 aptitude -y install git-core
