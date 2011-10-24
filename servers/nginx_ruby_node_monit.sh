@@ -3,6 +3,7 @@
 ##
 # Installation with auto tuning of filedescriptors with:
 # - Git
+# - Imagemagick
 # - Monit
 # - Nginx
 # - Node, NPM and CoffeeScript
