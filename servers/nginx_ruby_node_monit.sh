@@ -310,7 +310,7 @@ EOF
 ##
 # Tuning example application configuration
 ##
-banner_echo "Tuning example applications nginx configuration ..."
+banner_echo "Tuning example nginx site configuration, including maintenance catcher \$document_root/system/maintenance.html ..."
 touch $PREFIX/sites-available/site.conf.example
 echo "upstream thin {" >> $PREFIX/sites-available/site.conf.example
 for i in `seq 1 $system_cores`;
