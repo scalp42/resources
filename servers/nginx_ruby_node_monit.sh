@@ -322,13 +322,17 @@ echo "" >> $PREFIX/sites-available/site.conf.example
 echo "server {" >> $PREFIX/sites-available/site.conf.example
 echo "  listen      80;" >> $PREFIX/sites-available/site.conf.example
 echo "  server_name localhost;" >> $PREFIX/sites-available/site.conf.example
-echo "  root        /data/www/cloudsalot/production/current/public;" >> $PREFIX/sites-available/site.conf.example
+echo "  root        /data/www/application/production/current/public;" >> $PREFIX/sites-available/site.conf.example
 echo "  " >> $PREFIX/sites-available/site.conf.example
 echo "  location / {" >> $PREFIX/sites-available/site.conf.example
 echo "    proxy_set_header X-Real-IP \$remote_addr;" >> $PREFIX/sites-available/site.conf.example
 echo "    proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;" >> $PREFIX/sites-available/site.conf.example
 echo "    proxy_set_header Host \$http_host;" >> $PREFIX/sites-available/site.conf.example
 echo "    proxy_redirect   off;" >> $PREFIX/sites-available/site.conf.example
+echo "    " >> $PREFIX/sites-available/site.conf.example
+echo "    if (-f \$request_filename) {" >> $PREFIX/sites-available/site.conf.example
+echo "      break;" >> $PREFIX/sites-available/site.conf.example
+echo "    }" >> $PREFIX/sites-available/site.conf.example
 echo "    " >> $PREFIX/sites-available/site.conf.example
 echo "    if (-f \$request_filename/index.html) {" >> $PREFIX/sites-available/site.conf.example
 echo "      rewrite (.*) \$1/index.html break;" >> $PREFIX/sites-available/site.conf.example
@@ -369,26 +373,18 @@ cd $SRC_PATH
 rm -rf resources
 
 banner_echo "... installation completed!"
-
-echo ""
-echo "##"
-echo "# Precompile assets in production"
-echo "# preferably add as a callback in capistrano after deploy"
-echo "##"
-echo ""
-echo "RAILS_ENV=#{rails_env} bundle exec rake assets:precompile"
 echo ""
 echo "##"
 echo "# Start Thin"
 echo "##"
 echo ""
-echo "sudo thin -C /usr/local/conf/thin.yml start"
-echo "sudo thin -C /usr/local/conf/thin.yml stop"
+echo "--- See http://github.com/RobertBrewitz/resources/tree/master/rails/config directory for thin and capistrano examples ---"
 echo ""
 echo "##"
 echo "# Start Nginx"
 echo "##"
 echo ""
+echo "--- See /usr/local/sites-available/site.conf.example for thin and capistrano examples ---"
 echo "sudo /etc/init.d/nginx start"
 echo "sudo /etc/init.d/nginx stop"
 echo ""

@@ -19,11 +19,29 @@ role :db,  "my.ip.to.server", primary: true
 before "deploy:symlink", :bundle_deployment
 desc "Bundle deployment"
 task :bundle_deployment do
-  run "cd #{release_path} && bundle install --deployment --without development test"
+  run "cd #{release_path} && RAILS_ENV=#{rails_env} bundle install --deployment --without development test"
 end
 
 after "bundle_deployment", :precompile_assets
 desc "Precompiles assets"
 task :precompile_assets, role: :app do
-  run "cd #{release_path} && RAILS_ENV=#{stage} bundle exec rake assets:precompile"
+  run "cd #{release_path} && RAILS_ENV=#{rails_env} bundle exec rake assets:precompile"
+end
+
+namespace :deploy do
+  desc "Start thin"
+  task :start, role: :app do
+    run "cd #{current_path} && RAILS_ENV=#{rails_env} sudo bundle exec thin -C config/thin/#{rails_env}.yml start"
+  end
+  
+  desc "Start thin"
+  task :stop, role: :app do
+    run "cd #{current_path} && RAILS_ENV=#{rails_env} sudo bundle exec thin -C config/thin/#{rails_env}.yml stop"
+  end
+  
+  desc "Restart thin"
+  task :restart, role: :app do
+    invoke "deploy:stop"
+    invoke "deploy:start"
+  end
 end

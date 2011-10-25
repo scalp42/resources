@@ -1,0 +1,10 @@
+daemonize: true
+socket: /tmp/thin.staging.sock
+pid: /var/run/thin.staging.pid
+log: /var/log/thin/staging.log
+servers: 1
+max_conns: 58066
+max_persistent_conns: 512
+timeout: 60
+chdir: /data/www/application/staging/current
+environment: staging

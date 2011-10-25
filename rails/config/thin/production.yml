@@ -1,0 +1,10 @@
+daemonize: true
+socket: /tmp/thin.production.sock
+pid: /var/run/thin.production.pid
+log: /var/log/thin/production.log
+servers: 1
+max_conns: 58066
+max_persistent_conns: 512
+timeout: 60
+chdir: /data/www/application/production/current
+environment: production
