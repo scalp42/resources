@@ -34,6 +34,6 @@
   # After logfile is rotated, send the USR1 signal
   ##
   postrotate
-    [ ! -f /var/run/mongod.pid ] || kill -USR1 `cat /var/run/mongod.pid`
+    [ ! -f /data/db/mongod.lock ] || kill -USR1 `cat /data/db/mongod.lock`
   endscript
 }
