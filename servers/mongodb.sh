@@ -157,7 +157,7 @@ EOF
 banner_echo "Setting up directories ..."
 mkdir -p /var/log/mongodb
 mkdir -p /data/db
-chown -R mongodb:mongodb /data/db
+chown -R ubuntu:ubuntu /data/db
 chmod 775 /data/db
 
 ##

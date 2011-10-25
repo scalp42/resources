@@ -55,7 +55,7 @@ DAEMON=/usr/local/bin/mongod
 NAME=mongod
 DESC=mongod
 DAEMON_OPTS="--dbpath /data/db --logpath /var/log/mongodb/mongod.log --config /usr/local/conf/mongodb.conf run"
-PIDFILE=/var/run/$NAME.pid
+PIDFILE=/data/db/$NAME.lock
 STARTTIME=5
 DIETIME=10
 
