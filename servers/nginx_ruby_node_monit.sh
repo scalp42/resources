@@ -330,6 +330,9 @@ echo "    proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;" >> $PRE
 echo "    proxy_set_header Host \$http_host;" >> $PREFIX/sites-available/site.conf.example
 echo "    proxy_redirect   off;" >> $PREFIX/sites-available/site.conf.example
 echo "    " >> $PREFIX/sites-available/site.conf.example
+echo "    if (-f \$document_root/system/maintenance.html) {" >> $PREFIX/sites-available/site.conf.example
+echo "      rewrite ^(.*)$ /system/maintenance.html break;" >> $PREFIX/sites-available/site.conf.example
+echo "    }" >> $PREFIX/sites-available/site.conf.example
 echo "    if (-f \$request_filename) {" >> $PREFIX/sites-available/site.conf.example
 echo "      break;" >> $PREFIX/sites-available/site.conf.example
 echo "    }" >> $PREFIX/sites-available/site.conf.example
