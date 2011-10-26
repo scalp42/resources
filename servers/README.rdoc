@@ -24,8 +24,3 @@ Run script in foreground with
   bash mongodb.sh
 or in background with
   nohup bash mongodb.sh &
-== Rails
-Might have to add to environment.rb for *.yml files to load values properly
-  # fix for YAML configs
-  require 'yaml'
-  YAML::ENGINE.yamler = 'syck'
