@@ -6,3 +6,9 @@ Install ruby, follow instructions at http://www.ruby-lang.org/en/downloads/
 
 When ruby is installed, install the following gems
   gem install capistrano capistrano-ext railsless-deploy --no-ri --no-rdoc
+=== Add files to your project
+copy the 'config' directory into your wordpress project root
+
+copy the file 'Capfile' into your wordpress project root
+=== If you use git
+copy the file 'gitignore' into your wordpress project root and rename it to '.gitignore'
