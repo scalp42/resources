@@ -13,9 +13,9 @@ set :deploy_via, :remote_cache
 set :keep_releases, 5
 set :scm, :git
 
-role :web, "<my.ip.to.server>"
-role :app, "<my.ip.to.server>"
-role :db,  "<my.ip.to.server>", primary: true
+role :web, "<ip-or-domain>"
+role :app, "<ip-or-domain>"
+role :db,  "<ip-or-domain>", primary: true
 
 after "deploy:setup", "wordpress:shared_directories"
 before "deploy:symlink", "wordpress:shared_resources"

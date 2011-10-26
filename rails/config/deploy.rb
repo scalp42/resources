@@ -13,9 +13,9 @@ set :deploy_via, :remote_cache
 set :keep_releases, 5
 set :scm, :git
 
-role :web, "<my.ip.to.server>"
-role :app, "<my.ip.to.server>"
-role :db,  "<my.ip.to.server>", primary: true
+role :web, "<ip-or-domain>"
+role :app, "<ip-or-domain>"
+role :db,  "<ip-or-domain>", primary: true
 
 ##
 # Using a mongoid.yml config file in shared directory due to recent problems with yaml and embedded ruby
