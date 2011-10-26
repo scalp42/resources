@@ -22,7 +22,7 @@ before "deploy:symlink", "wordpress:shared_resources"
 
 desc "Wordpress capistrano tasks"
 namespace :wordpress do
-  desc "Shared directories"
+  desc "Sets up shared directories"
   task :shared_directories do
     run "mkdir -p #{shared_path}/logs"
     run "chmod g+w #{shared_path}/logs"
@@ -30,7 +30,7 @@ namespace :wordpress do
     run "chmod g+w #{shared_path}/uploads"
   end
   
-  desc "Symlink files"
+  desc "Symlinks shared resources"
   task :shared_resources do
     run "ln -s #{shared_path}/uploads #{release_path}/wp-content/uploads"
   end
