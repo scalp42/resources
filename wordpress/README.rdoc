@@ -1,8 +1,8 @@
 = Wordpress resources
 == Capistrano
 Deployment recipe for wordpress
-=== Install dependencies
+=== Install dependencies on localhost
 Install ruby, follow instructions at http://www.ruby-lang.org/en/downloads/
 
-When ruby is install the following gems
+When ruby is installed, install the following gems
   gem install capistrano capistrano-ext railsless-deploy --no-ri --no-rdoc
