@@ -1,5 +1,4 @@
-set :branch, "production"
 set :stage, "production"
-set :rails_env, "production"
+ssh_options[:keys] = ["~/.ssh/<pem-key-file>"]
 set :deploy_to, "/data/www/#{application}/#{stage}"
-ssh_options[:keys] = ["~/.ssh/my-key.pem"]
+set :branch, "#{stage}"

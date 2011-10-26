@@ -1,20 +1,21 @@
 require 'capistrano/ext/multistage'
-set :application, "application-name"
-set :repository,  "git-repository"
+set :application, "<application-name>"
+set :repository, "<git-repository>"
 set :user, "ubuntu"
 set :stages, %w(staging production)
 set :default_stage, "staging"
-default_run_options[:pty] = true
+
 set :use_sudo, false
+set :scm_verbose, true
+default_run_options[:pty] = true
 set :copy_exclude, [".git",".gitignore", "config/mongoid.yml"] # added mongoid.yml due to recent yaml and embedded ruby problems
 set :deploy_via, :remote_cache
 set :keep_releases, 5
 set :scm, :git
-set :scm_verbose, true
 
-role :web, "my.ip.to.server"
-role :app, "my.ip.to.server"
-role :db,  "my.ip.to.server", primary: true
+role :web, "<my.ip.to.server>"
+role :app, "<my.ip.to.server>"
+role :db,  "<my.ip.to.server>", primary: true
 
 ##
 # Using a mongoid.yml config file in shared directory due to recent problems with yaml and embedded ruby
