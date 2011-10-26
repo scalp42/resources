@@ -1,0 +1,13 @@
+= MongoDB powered Rails 3.1.X application capistrano recepy
+== Install dependencies on your localhost
+  gem install capistrano capistrano-ext --no-ri --no-rdoc
+== Deployment staging
+Set up applciation directories
+  cap staging deploy:setup
+Deploy to staging
+  cap staging deploy:update
+== Deployment production
+Set up applciation directories
+  cap production deploy:setup
+Deploy to production
+  cap production deploy:update
