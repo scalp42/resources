@@ -3,30 +3,31 @@ git :init
 file "Gemfile", <<-END
 source 'http://rubygems.org'
 
-gem 'rails', '3.1.0'
+gem 'rails', '3.1.1'
 
-gem "mongoid", "~> 2.3.0"
-gem "bson_ext", "~> 1.4.0"
-gem "mongo", "~> 1.4.0"
-gem "bson", "~> 1.4.0"
+gem 'mongoid', '~> 2.3.3'
+gem 'bson_ext', '~> 1.3.1'
+gem 'mongo', '~> 1.3.1'
+gem 'bson', '~> 1.3.1'
 
 group :assets do
-  gem 'sass-rails', "  ~> 3.1.0"
-  gem 'coffee-rails', "~> 3.1.0"
+  gem 'sass-rails', '  ~> 3.1.4'
+  gem 'coffee-rails', '~> 3.1.1'
+  gem 'haml-rails', '~> 0.3.4'
   gem 'uglifier'
 end
 
 gem 'jquery-rails'
 
-gem "rspec-rails", :group => [:test, :development]
+gem 'rspec-rails', :group => [:test, :development]
 group :test do
-  gem "factory_girl_rails"
-  gem "capybara"
-  gem "guard-rspec"
-  gem "mongoid-rspec"
-  gem "database_cleaner"
-  gem "spork", "~> 0.9.0.rc9"
-  gem "guard-spork"
+  gem 'factory_girl_rails'
+  gem 'capybara'
+  gem 'guard-rspec'
+  gem 'mongoid-rspec'
+  gem 'database_cleaner'
+  gem 'spork', '~> 0.9.0.rc9'
+  gem 'guard-spork'
 end
 END
 
