@@ -1,5 +1,7 @@
 git :init
 
+run "rm public/index.html app/assets/images/rails.png"
+
 file "Gemfile", <<-END
 source 'http://rubygems.org'
 
@@ -13,6 +15,7 @@ gem 'bson', '~> 1.3.1'
 group :assets do
   gem 'sass-rails', '  ~> 3.1.4'
   gem 'coffee-rails', '~> 3.1.1'
+  gem 'haml', '~> 3.1.3'
   gem 'haml-rails', '~> 0.3.4'
   gem 'uglifier'
 end
