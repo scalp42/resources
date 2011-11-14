@@ -12,3 +12,12 @@ copy the 'config' directory into your wordpress project root
 copy the file 'Capfile' into your wordpress project root
 === If you use git
 copy the file 'gitignore' into your wordpress project root and rename it to '.gitignore'
+== wp-config.php and .htaccess
+Copy wp-config.php and .htaccess from shared/cached-copy directory to shared directory for the before symlink callback 'wordpress:shared_resources'.
+== Uploads directory
+Make sure to git rm --cached -r wp-content/uploads in your repository and add wp-content/uploads to .gitignore.
+If you have already deployed with the uploads directory and have uploaded live content run:
+  cd shared
+  mkdir uploads
+  cd ../releases
+  cp -R */wp-content/uploads/* shared/uploads/
