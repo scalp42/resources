@@ -8,7 +8,7 @@ set :default_stage, "staging"
 set :use_sudo, false
 set :scm_verbose, true
 default_run_options[:pty] = true
-set :copy_exclude, [".git",".gitignore"]
+set :copy_exclude, [".git",".gitignore", "wp-config.php", ".htaccess"]
 set :deploy_via, :remote_cache
 set :keep_releases, 5
 set :scm, :git
@@ -33,5 +33,7 @@ namespace :wordpress do
   desc "Symlinks shared resources"
   task :shared_resources do
     run "ln -s #{shared_path}/uploads #{release_path}/wp-content/uploads"
+    run "ln -s #{shared_path}/wp-config.php #{release_path}/wp-config.php"
+    run "ln -s #{shared_path}/.htaccess #{release_path}/.htaccess"
   end
 end
