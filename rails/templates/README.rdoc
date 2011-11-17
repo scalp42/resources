@@ -1,4 +1,4 @@
 = Templates
 == TDD/BDD template for Rails 3.1.0 with Mongoid
 templates/mongo-bdd-3.1.0.rb
-  rails new <app_name> -f -m <path-to>/mongo-bdd-3.1.0.rb --skip-test-unit --skip-active-record --skip-bundle
+  rails new <app_name> -f -m <path-to>/mongo-tdd.rb --skip-test-unit --skip-active-record --skip-bundle
