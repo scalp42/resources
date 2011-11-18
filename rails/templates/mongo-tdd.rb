@@ -123,7 +123,7 @@ Spork.prefork do
 
     config.before(:suite) do
       DatabaseCleaner.strategy = :truncation
-      DatabaseCleaner.orm = "mongoid"
+      DatabaseCleaner.orm = 'mongoid'
     end
 
     config.before(:each) do
