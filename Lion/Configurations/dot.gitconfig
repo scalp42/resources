@@ -30,5 +30,9 @@
   mos = merge staging
   mod = merge development
   mop = merge production
+  rom = rebase master
+  ros = rebase staging
+  rod = rebase development
+  rop = rebase production
 [github]
   user = <username>
