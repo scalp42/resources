@@ -111,7 +111,7 @@ Spork.prefork do
   require 'rspec/rails'
   require 'capybara/rspec'
   require 'database_cleaner'
-  require "rails/mongoid"
+  require 'rails/mongoid'
 
   Spork.trap_class_method(Rails::Mongoid, :load_models)
   Spork.trap_method(Rails::Application::RoutesReloader, :reload!)
