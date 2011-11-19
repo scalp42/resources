@@ -51,7 +51,7 @@ if [ ! -n "$NGINX_VERSION" ]; then
 fi
 
 if [ ! -n "$NODE_VERSION"]; then
-  NODE_VERSION="v0.4.12"
+  NODE_VERSION="v0.6.2"
 fi
 
 if [ ! -n "$RUBY_VERSION" ]; then
