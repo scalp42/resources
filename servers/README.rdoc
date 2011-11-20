@@ -7,6 +7,8 @@
 * Generates tuned configurations based on systems file-descriptors and cpu cores
 * Sets up init scripts
 * Sets up logrotate
+== Note on the auto-tuning
+The tuning does not get properly run if the process is run in the background with 'nohup' and '&'
 == Install
 Download resources
   cd ~/
@@ -21,11 +23,11 @@ Run script in foreground with
 Run script in foreground with
   bash mongodb.sh
 == Nginx
-sudo /etc/init.d/nginx start
-sudo /etc/init.d/nginx stop
+  sudo /etc/init.d/nginx start
+  sudo /etc/init.d/nginx stop
 == Thin
-sudo thin -C path/to/config.yml start
-sudo thin -C path/to/config.yml stop
+  sudo thin -C path/to/config.yml start
+  sudo thin -C path/to/config.yml stop
 = Mount Volume
 Replace * with the name of the volume ID/Name
   aptitude -y install xfsprogs
