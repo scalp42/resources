@@ -24,3 +24,16 @@ Run script in foreground with
   bash mongodb.sh
 or in background with
   nohup bash mongodb.sh &
+== Nginx
+sudo /etc/init.d/nginx start
+sudo /etc/init.d/nginx stop
+== Thin
+sudo thin -C path/to/config.yml start
+sudo thin -C path/to/config.yml stop
+= Mount Volume
+Replace * with the name of the volume ID/Name
+  aptitude -y install xfsprogs
+  mkfs.xfs /dev/sd*
+  mkdir -m 000 /data
+  echo /dev/sd* /data xfs noatime 0 0 | sudo tee -a /etc/fstab
+  mount /data

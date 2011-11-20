@@ -359,16 +359,6 @@ echo "  }" >> $PREFIX/sites-available/site.conf.example
 echo "}" >> $PREFIX/sites-available/site.conf.example
 
 ##
-# Data directories
-##
-banner_echo "Setting up directories ..."
-mkdir -p /data/www
-chown -R ubuntu:ubuntu /data/www
-chmod 775 /data/www
-ln -s /data/www /www
-ln -s /data/www /var/www
-
-##
 # Cleanup
 ##
 banner_echo "Cleaning up installation files ..."
@@ -376,40 +366,3 @@ cd $SRC_PATH
 rm -rf resources
 
 banner_echo "... installation completed!"
-echo ""
-echo "##"
-echo "# Start Thin"
-echo "##"
-echo ""
-echo "--- See http://github.com/RobertBrewitz/resources/tree/master/rails/config directory for thin and capistrano examples ---"
-echo ""
-echo "##"
-echo "# Start Nginx"
-echo "##"
-echo ""
-echo "--- See /usr/local/sites-available/site.conf.example for thin and capistrano examples ---"
-echo "sudo /etc/init.d/nginx start"
-echo "sudo /etc/init.d/nginx stop"
-echo ""
-echo "##"
-echo "# Start services on server startup"
-echo "##"
-echo ""
-echo "Add all service start commands before 'exit 0' in '/etc/rc.local' as such:"
-echo " 1:  !/bin/sh -e"
-echo " 2:  "
-echo " 3:  rc.local"
-echo " 4:  "
-echo " 5:  This script is executed at the end of each multiuser runlevel."
-echo " 6:  Make sure that the script will \"exit 0\" on success or any other"
-echo " 7:  value on error."
-echo " 8:  "
-echo " 9:  In order to enable or disable this script just change the execution"
-echo "10:  bits."
-echo "11:  "
-echo "12:  By default this script does nothing."
-echo "13:  "
-echo "15:  sudo thin -C /usr/local/conf/thin.yml start"
-echo "16:  sudo /etc/init.d/nginx start"
-echo "17:  "
-echo "18:  exit 0"
