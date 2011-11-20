@@ -41,7 +41,9 @@ if [ ! -n "$MONGODB_VERSION" ]; then
   MONGODB_VERSION="r2.0.1"
 fi
 
-system_fd_maxsize=$(more /proc/sys/fs/file-max*)
+if [ ! -n "$SYSTEM_FD_MAXSIZE" ]; then
+  SYSTEM_FD_MAXSIZE=$(more /proc/sys/fs/file-max*)
+fi
 
 function banner_echo {
   echo ""
@@ -101,11 +103,11 @@ aptitude -y install tcsh git-core scons g++ libpcre++-dev libboost-dev libreadli
 ##
 banner_echo "Tuning filedescriptors ..."
 cat > /etc/security/limits.conf << EOF
-* soft nofile $system_fd_maxsize
-* hard nofile $system_fd_maxsize
+* soft nofile $SYSTEM_FD_MAXSIZE
+* hard nofile $SYSTEM_FD_MAXSIZE
 EOF
-sed -i s/\#define\\t__FD_SETSIZE\\t\\t1024/\#define\\t__FD_SETSIZE\\t\\t$system_fd_maxsize/g /usr/include/bits/typesizes.h
-sed -i s/\#define\\s__FD_SETSIZE\\t1024/\#define\\t__FD_SETSIZE\\t$system_fd_maxsize/g /usr/include/linux/posix_types.h
+sed -i s/\#define\\t__FD_SETSIZE\\t\\t1024/\#define\\t__FD_SETSIZE\\t\\t$SYSTEM_FD_MAXSIZE/g /usr/include/bits/typesizes.h
+sed -i s/\#define\\s__FD_SETSIZE\\t1024/\#define\\t__FD_SETSIZE\\t$SYSTEM_FD_MAXSIZE/g /usr/include/linux/posix_types.h
 
 ##
 # MongoDB prequisits

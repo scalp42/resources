@@ -17,13 +17,9 @@ Download resources
 === Nginx_ruby_node_monit
 Run script in foreground with
   bash nginx_ruby_node_monit.sh
-or in background with
-  nohup bash nginx_ruby_node_monit.sh &
 === MongoDB
 Run script in foreground with
   bash mongodb.sh
-or in background with
-  nohup bash mongodb.sh &
 == Nginx
 sudo /etc/init.d/nginx start
 sudo /etc/init.d/nginx stop

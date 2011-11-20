@@ -58,8 +58,13 @@ if [ ! -n "$RUBY_VERSION" ]; then
   RUBY_VERSION="1.9.2-p290"
 fi
 
-system_fd_maxsize=$(more /proc/sys/fs/file-max*)
-system_cores=$(cat /proc/cpuinfo | grep processor | wc -l)
+if [ ! -n "$SYSTEM_FD_MAXSIZE" ]; then
+  SYSTEM_FD_MAXSIZE=$(more /proc/sys/fs/file-max*)
+fi
+
+if [ ! -n "$SYSTEM_CORES" ]; then
+  SYSTEM_CORES=$(cat /proc/cpuinfo | grep processor | wc -l)
+fi
 
 function banner_echo {
   echo ""
@@ -116,16 +121,16 @@ aptitude -y install build-essential zlib1g-dev libxml2-dev libxslt-dev \
                     ncurses-dev libncurses-ruby \
                     libreadline-dev libreadline-ruby
 
-banner_echo "Installing Git ..."
+banner_echo "Installing Git..."
 aptitude -y install git-core
 
-banner_echo "Installing Nginx dependencies ..."
+banner_echo "Installing Nginx $NGINX_VERSION dependencies ..."
 aptitude -y install libpcre3-dev libssl-dev # zlib1g-dev already required by Ruby
 
-banner_echo "Installing Node dependencies ..."
+banner_echo "Installing Node $NODE_VERSION dependencies ..."
 aptitude -y install pkg-config
 
-banner_echo "Installing monit dependencies ..."
+banner_echo "Installing monit $MONIT_VERSION dependencies ..."
 aptitude -y install flex bison
 
 banner_echo "Installing Imagemagick and dependencies ..."
@@ -136,17 +141,17 @@ aptitude -y install libmagickwand-dev imagemagick
 ##
 banner_echo "Tuning filedescriptors ..."
 cat > /etc/security/limits.conf << EOF
-* soft nofile $system_fd_maxsize
-* hard nofile $system_fd_maxsize
+* soft nofile $SYSTEM_FD_MAXSIZE
+* hard nofile $SYSTEM_FD_MAXSIZE
 EOF
-sed -i s/\#define\\t__FD_SETSIZE\\t\\t1024/\#define\\t__FD_SETSIZE\\t\\t$system_fd_maxsize/g /usr/include/bits/typesizes.h
-sed -i s/\#define\\s__FD_SETSIZE\\t1024/\#define\\t__FD_SETSIZE\\t$system_fd_maxsize/g /usr/include/linux/posix_types.h
+sed -i s/\#define\\t__FD_SETSIZE\\t\\t1024/\#define\\t__FD_SETSIZE\\t\\t$SYSTEM_FD_MAXSIZE/g /usr/include/bits/typesizes.h
+sed -i s/\#define\\s__FD_SETSIZE\\t1024/\#define\\t__FD_SETSIZE\\t$SYSTEM_FD_MAXSIZE/g /usr/include/linux/posix_types.h
 
 ##
 # Monit
 ##
 
-banner_echo "Installing Monit ..."
+banner_echo "Installing Monit $MONIT_VERSION ..."
 
 # Download and install
 cd $SRC_PATH
@@ -162,7 +167,7 @@ rm -rf monit-$MONIT_VERSION*
 ##
 # Nginx
 ##
-banner_echo "Installing Nginx ..."
+banner_echo "Installing Nginx $NGINX_VERSION ..."
 cd $SRC_PATH
 wget http://nginx.org/download/nginx-$NGINX_VERSION.tar.gz -O $SRC_PATH/nginx-$NGINX_VERSION.tar.gz
 tar -zxvf nginx-$NGINX_VERSION.tar.gz
@@ -213,13 +218,13 @@ banner_echo "Tuning nginx configuration ..."
 cat > $PREFIX/conf/nginx.conf << EOF
 user www-data www-data;
 pid /var/run/nginx.pid;
-worker_processes $system_cores;
-worker_rlimit_nofile $system_fd_maxsize;
+worker_processes $SYSTEM_CORES;
+worker_rlimit_nofile $SYSTEM_FD_MAXSIZE;
 
 events {
   use epoll;
-  epoll_events $system_fd_maxsize;
-  worker_connections $(($system_fd_maxsize / $system_cores));
+  epoll_events $SYSTEM_FD_MAXSIZE;
+  worker_connections $(($SYSTEM_FD_MAXSIZE / $SYSTEM_CORES));
 }
 
 http {
@@ -299,8 +304,8 @@ daemonize: true
 socket: /tmp/thin.sock
 pid: /var/run/thin.pid
 log: /var/log/thin/thin.log
-servers: $system_cores
-max_conns: $(($system_fd_maxsize / $system_cores))
+servers: $SYSTEM_CORES
+max_conns: $(($SYSTEM_FD_MAXSIZE / $SYSTEM_CORES))
 max_persistent_conns: 512
 timeout: 60
 chdir: /data/www/application/production/current
@@ -313,7 +318,7 @@ EOF
 banner_echo "Tuning example nginx site configuration, including maintenance catcher \$document_root/system/maintenance.html ..."
 touch $PREFIX/sites-available/site.conf.example
 echo "upstream thin {" >> $PREFIX/sites-available/site.conf.example
-for i in `seq 1 $system_cores`;
+for i in `seq 1 $SYSTEM_CORES`;
 do
   echo "  server unix:/tmp/thin.$(($i-1)).sock;" >> $PREFIX/sites-available/site.conf.example
 done
