@@ -266,18 +266,19 @@ EOF
 ##
 # CoffeScript
 ##
-banner_echo "Installing Node $NODE_VERSION, Node Package Manager and CoffeScript ..."
-cd $SRC_PATH
-git clone git://github.com/joyent/node.git
-cd node
-git checkout $NODE_VERSION
-./configure --prefix=$PREFIX --dest-cpu=x64
-make
-make install
-cd $SRC_PATH
-rm -rf node
-curl http://npmjs.org/install.sh | bash
-npm install -g coffee-script
+
+# banner_echo "Installing Node $NODE_VERSION, Node Package Manager and CoffeScript ..."
+# cd $SRC_PATH
+# git clone git://github.com/joyent/node.git
+# cd node
+# git checkout $NODE_VERSION
+# ./configure --prefix=$PREFIX --dest-cpu=x64
+# make
+# make install
+# cd $SRC_PATH
+# rm -rf node
+# curl http://npmjs.org/install.sh | bash
+# npm install -g coffee-script
 
 ##
 # Ruby
