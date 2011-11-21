@@ -276,7 +276,7 @@ make
 make install
 cd $SRC_PATH
 rm -rf node
-curl http://npmjs.org/install.sh | sh
+curl http://npmjs.org/install.sh | bash
 npm install -g coffee-script
 
 ##
@@ -338,6 +338,7 @@ echo "    " >> $PREFIX/sites-available/site.conf.example
 echo "    if (-f \$document_root/system/maintenance.html) {" >> $PREFIX/sites-available/site.conf.example
 echo "      rewrite ^(.*)$ /system/maintenance.html break;" >> $PREFIX/sites-available/site.conf.example
 echo "    }" >> $PREFIX/sites-available/site.conf.example
+echo "    " >> $PREFIX/sites-available/site.conf.example
 echo "    if (-f \$request_filename) {" >> $PREFIX/sites-available/site.conf.example
 echo "      break;" >> $PREFIX/sites-available/site.conf.example
 echo "    }" >> $PREFIX/sites-available/site.conf.example
