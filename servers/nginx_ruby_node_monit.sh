@@ -50,10 +50,6 @@ if [ ! -n "$NGINX_VERSION" ]; then
   NGINX_VERSION="1.0.8"
 fi
 
-if [ ! -n "$NODE_VERSION"]; then
-  NODE_VERSION="v0.6.2"
-fi
-
 if [ ! -n "$RUBY_VERSION" ]; then
   RUBY_VERSION="1.9.2-p290"
 fi
@@ -127,7 +123,7 @@ aptitude -y install git-core
 banner_echo "Installing Nginx $NGINX_VERSION dependencies ..."
 aptitude -y install libpcre3-dev libssl-dev # zlib1g-dev already required by Ruby
 
-banner_echo "Installing Node $NODE_VERSION dependencies ..."
+banner_echo "Installing Node v0.6.2 dependencies ..."
 aptitude -y install pkg-config
 
 banner_echo "Installing monit $MONIT_VERSION dependencies ..."
@@ -267,18 +263,18 @@ EOF
 # CoffeScript
 ##
 
-# banner_echo "Installing Node $NODE_VERSION, Node Package Manager and CoffeScript ..."
-# cd $SRC_PATH
-# git clone git://github.com/joyent/node.git
-# cd node
-# git checkout $NODE_VERSION
-# ./configure --prefix=$PREFIX --dest-cpu=x64
-# make
-# make install
-# cd $SRC_PATH
-# rm -rf node
-# curl http://npmjs.org/install.sh | bash
-# npm install -g coffee-script
+banner_echo "Installing Node v0.6.2, Node Package Manager and CoffeScript ..."
+cd $SRC_PATH
+wget http://nodejs.org/dist/node-v0.6.2.tar.gz -O $SRC_PATH/node-v0.6.2.tar.gz
+tar xzvf node-v0.6.2.tar.gz
+cd $SRC_PATH/node-v0.6.2
+./configure --prefix=$PREFIX --dest-cpu=x64
+make
+make install
+cd $SRC_PATH
+rm -rf node-*
+curl http://npmjs.org/install.sh | sh
+npm install -g coffee-script
 
 ##
 # Ruby
