@@ -100,7 +100,7 @@ rm -rf js*
 ##
 banner_echo "Installing MongoDB ..."
 cd $SRC_PATH
-git clone git@github.com:RobertBrewitz/mongo.git
+git clone git://github.com/RobertBrewitz/mongo.git
 cd mongo
 scons all
 scons --prefix=$PREFIX install
