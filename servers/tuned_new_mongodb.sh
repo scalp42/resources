@@ -1,7 +1,7 @@
 #! /bin/bash
 
 ##
-# Installation:
+# Installation with auto tuning of filedescriptors with:
 # - SpiderMonkey patch
 # - Replacing XULrunner
 # - MongoDB 2.0.1
@@ -38,6 +38,10 @@ if [ ! -n "$SRC_PATH" ]; then
   SRC_PATH="$PREFIX/src"
 fi
 
+if [ ! -n "$SYSTEM_FD_MAXSIZE" ]; then
+  SYSTEM_FD_MAXSIZE=$(more /proc/sys/fs/file-max*)
+fi
+
 function banner_echo {
   echo ""
   echo "##"
@@ -52,12 +56,55 @@ mkdir -p $SRC_PATH
 cp -rf resources $SRC_PATH/resources
 
 ##
+# System settings and updates
+##
+banner_echo "Updating locales ..."
+locale-gen
+LC_CTYPE="en_GB.UTF-8"
+LC_ALL="en_GB.UTF-8"
+LANGUAGE="en_GB.UTF-8"
+LANG="en_GB.UTF-8"
+
+banner_echo "Updating sources and upgrading system ..."
+cat > /etc/apt/sources.list << EOF
+## main & restricted repositories
+deb http://us.archive.ubuntu.com/ubuntu/ lucid main restricted
+deb-src http://us.archive.ubuntu.com/ubuntu/ lucid main restricted
+
+deb http://security.ubuntu.com/ubuntu lucid-security main restricted
+deb-src http://security.ubuntu.com/ubuntu lucid-security main restricted
+
+## universe repositories
+deb http://us.archive.ubuntu.com/ubuntu/ lucid universe
+deb-src http://us.archive.ubuntu.com/ubuntu/ lucid universe
+deb http://us.archive.ubuntu.com/ubuntu/ lucid-updates universe
+deb-src http://us.archive.ubuntu.com/ubuntu/ lucid-updates universe
+
+deb http://security.ubuntu.com/ubuntu lucid-security universe
+deb-src http://security.ubuntu.com/ubuntu lucid-security universe
+EOF
+
+apt-get -y update
+apt-get -y upgrade
+
+##
 # Dependencies
 ##
 banner_echo "Installing MongoDB dependencies ..."
 aptitude -y build-dep firefox
 aptitude -y install mercurial libasound2-dev libcurl4-openssl-dev libnotify-dev libxt-dev libiw-dev mesa-common-dev autoconf2.13 yasm
 aptitude -y install tcsh git-core scons g++ libpcre++-dev libboost-dev libreadline-dev xulrunner-1.9.2-dev install libboost-program-options-dev libboost-thread-dev libboost-filesystem-dev libboost-date-time-dev
+
+##
+# Filedescriptors
+##
+banner_echo "Tuning filedescriptors ..."
+cat > /etc/security/limits.conf << EOF
+* soft nofile $SYSTEM_FD_MAXSIZE
+* hard nofile $SYSTEM_FD_MAXSIZE
+EOF
+sed -i s/\#define\\t__FD_SETSIZE\\t\\t1024/\#define\\t__FD_SETSIZE\\t\\t$SYSTEM_FD_MAXSIZE/g /usr/include/bits/typesizes.h
+sed -i s/\#define\\s__FD_SETSIZE\\t1024/\#define\\t__FD_SETSIZE\\t$SYSTEM_FD_MAXSIZE/g /usr/include/linux/posix_types.h
 
 ##
 # MongoDB prequisits
