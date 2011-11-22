@@ -20,8 +20,10 @@ Download resources
 Run script in foreground with
   bash nginx_ruby_node_monit.sh
 === MongoDB
-Run script in foreground with
-  bash mongodb.sh
+For a sever with only MongoDB
+  bash mongodb_standalone.sh
+For an already tuned and installed server
+  bash mongodb_shared.sh
 == Nginx
   sudo /etc/init.d/nginx start
   sudo /etc/init.d/nginx stop
