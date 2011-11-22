@@ -126,12 +126,12 @@ rm -rf js*
 
 ##
 # MongoDB
+# Pulling from my own repository with master at r2.0.1 due to bash and git problems
 ##
 banner_echo "Installing MongoDB $MONGO_VERSION ..."
 cd $SRC_PATH
-git clone git://github.com/mongodb/mongo.git
+git clone git@github.com:RobertBrewitz/mongo.git
 cd mongo
-git checkout $MONGO_VERSION
 scons all
 scons --prefix=$PREFIX install
 cd $SRC_PATH
