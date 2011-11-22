@@ -113,6 +113,7 @@ chmod +x /etc/init.d/mongodb
 cp -f resources/logrotate/mongodb /etc/logrotate.d/mongodb
 
 banner_echo "Generating single server mongodb config ..."
+mkdir -p /var/log/mongodb
 cat > /usr/local/conf/mongodb.conf << EOF
 dbpath="/data/db"
 fork=true
@@ -122,15 +123,6 @@ logappend=true
 journal=true
 nohttpinterface=true
 EOF
-
-##
-# Directories and permission
-##
-banner_echo "Setting up directories ..."
-mkdir -p /var/log/mongodb
-mkdir -p /data/db
-chown -R ubuntu:ubuntu /data/db
-chmod 775 /data/db
 
 ##
 # Cleanup
