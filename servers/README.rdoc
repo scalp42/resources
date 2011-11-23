@@ -9,7 +9,14 @@ Replace <volume name> with the name of the volume name (for example 'sdf2')
   mkdir -m 000 /data
   echo /dev/<volume name> /data xfs noatime 0 0 | sudo tee -a /etc/fstab
   mount /data
-== Install
+== Directories
+MongoDB
+	mkdir -p /data/db
+	chown -R ubuntu:ubuntu /data/db
+Nginx
+	mkdir -p /data/www
+	chown -R www-data:www-data /data/www
+= Install
 Download resources
   cd ~/
   wget https://github.com/RobertBrewitz/resources/tarball/master -O master.tar.gz
