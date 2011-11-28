@@ -1,0 +1,4 @@
+= Development Lion Machine
+Install as a normal user, do _not_ use 'sudo' (or 'sudo su')
+== Configurations
+Check Configurations/dot.<file>
