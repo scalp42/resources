@@ -8,7 +8,7 @@ Download Xcode 3/4 Installer from App Store and run the installer from the appli
   
 == Ruby and Rails
   bash < <(curl -sk https://rvm.beginrescueend.com/install/rvm)
-  rvm install ruby-1.9.2-p280
+  rvm install ruby-1.9.2-p290
   rvm 1.9.2 --default
   gem install rails
   
