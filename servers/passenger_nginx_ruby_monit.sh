@@ -282,7 +282,7 @@ http {
   
   log_format            gzip '[\$status @ \$time_local <\$bytes_sent:\$gzip_ratio>] \$request from \$http_referer by \$http_user_agent';
   access_log            /var/log/nginx/access.log gzip buffer=32k;
-  error_log             /var/log/nginx/error.log crit buffer=32k;
+  error_log             /var/log/nginx/error.log crit;
   
   gzip              on;
   gzip_vary         on;
