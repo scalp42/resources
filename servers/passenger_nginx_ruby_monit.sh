@@ -302,7 +302,7 @@ EOF
 ##
 # Tuning example application configuration
 ##
-banner_echo "Tuning example nginx site configuration, including maintenance catcher \$document_root/system/maintenance.html ..."
+banner_echo "Example nginx configuration ..."
 cat > $PREFIX/sites-available/site.conf.example << EOF
 server {
   listen                     80;
