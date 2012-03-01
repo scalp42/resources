@@ -1,3 +1,10 @@
+#! /bin/bash
+
+##
+# Installation with auto tuning of filedescriptors with:
+# - MongoDB 2.0.2
+##
+
 ##
 # Copyright (c) 2012 Robert Brewitz
 # 
@@ -21,19 +28,4 @@
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ##
 
-/var/log/mongodb/*.log {
-  daily                         # rotate the logfile(s) daily
-  dateext                       # adds extension like YYYYMMDD instead of simply adding a number
-  missingok                     # If log file is missing, go on to next one without issuing an error msg
-  rotate 7                      # Save logfiles for the last 7 days
-  compress                      # Old versions of log files are compressed with gzip
-  delaycompress                 # Postpone compression of the previous log file to the next rotation cycle
-  notifempty                    # Do not rotate the log if it is empty
-  
-  ##
-  # After logfile is rotated, send the USR1 signal
-  ##
-  postrotate
-    [ ! -f /data/db/mongod.lock ] || kill -USR1 `cat /data/db/mongod.lock`
-  endscript
-}
+#http://fastdl.mongodb.org/linux/mongodb-linux-x86_64-2.0.2.tgz
