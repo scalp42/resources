@@ -43,11 +43,11 @@ if [ ! -n "$SRC_PATH" ]; then
 fi
 
 if [ ! -n "$MONIT_VERSION" ]; then
-  MONIT_VERSION="5.3"
+  MONIT_VERSION="5.3.2"
 fi
 
 if [ ! -n "$NGINX_VERSION" ]; then
-  NGINX_VERSION="1.0.8"
+  NGINX_VERSION="1.0.12"
 fi
 
 if [ ! -n "$RUBY_VERSION" ]; then
@@ -84,6 +84,10 @@ LC_CTYPE="en_GB.UTF-8"
 LC_ALL="en_GB.UTF-8"
 LANGUAGE="en_GB.UTF-8"
 LANG="en_GB.UTF-8"
+
+cat > /etc/default/locale << EOF
+LANG="en_GB.UTF-8"
+EOF
 
 banner_echo "Updating sources and upgrading system ..."
 cat > /etc/apt/sources.list << EOF
@@ -148,17 +152,30 @@ sed -i s/\#define\\s__FD_SETSIZE\\t1024/\#define\\t__FD_SETSIZE\\t$SYSTEM_FD_MAX
 ##
 
 banner_echo "Installing Monit $MONIT_VERSION ..."
-
-# Download and install
 cd $SRC_PATH
 wget http://mmonit.com/monit/dist/monit-$MONIT_VERSION.tar.gz -O $SRC_PATH/monit-$MONIT_VERSION.tar.gz
 tar -zxvf monit-$MONIT_VERSION.tar.gz
 cd monit-$MONIT_VERSION
-./configure --prefix=$PREFIX
+./configure --prefix=$PREFIX --enable-optimized
 make
 make install
 cd $SRC_PATH
 rm -rf monit-$MONIT_VERSION*
+
+##
+# Ruby
+##
+banner_echo "Installing Ruby $RUBY_VERSION ..."
+cd $SRC_PATH
+wget http://ftp.ruby-lang.org/pub/ruby/1.9/ruby-$RUBY_VERSION.tar.gz -O $SRC_PATH/ruby-$RUBY_VERSION.tar.gz
+tar -zxvf ruby-$RUBY_VERSION.tar.gz
+cd ruby-$RUBY_VERSION
+./configure --prefix=$PREFIX --disable-install-doc --with-out-ext=tk,win32ole # --with-readline-dir=/lib --with-ncurses-dir=/lib
+make
+make install
+cd $SRC_PATH
+rm -rf ruby-$RUBY_VERSION*
+gem install bundler --no-ri --no-rdoc
 
 ##
 # Nginx
@@ -215,12 +232,12 @@ cat > $PREFIX/conf/nginx.conf << EOF
 user www-data www-data;
 pid /var/run/nginx.pid;
 worker_processes $SYSTEM_CORES;
-worker_rlimit_nofile $SYSTEM_FD_MAXSIZE;
+worker_rlimit_nofile $(($SYSTEM_FD_MAXSIZE / 2));
 
 events {
   use epoll;
-  epoll_events $SYSTEM_FD_MAXSIZE;
-  worker_connections $(($SYSTEM_FD_MAXSIZE / $SYSTEM_CORES));
+  epoll_events $(($SYSTEM_FD_MAXSIZE / 2));
+  worker_connections $(($SYSTEM_FD_MAXSIZE / $SYSTEM_CORES / 2));
 }
 
 http {
@@ -260,38 +277,6 @@ http {
 EOF
 
 ##
-# CoffeScript
-##
-
-banner_echo "Installing Node v0.6.2, Node Package Manager and CoffeScript ..."
-cd $SRC_PATH
-wget http://nodejs.org/dist/node-v0.6.2.tar.gz -O $SRC_PATH/node-v0.6.2.tar.gz
-tar xzvf node-v0.6.2.tar.gz
-cd $SRC_PATH/node-v0.6.2
-./configure --prefix=$PREFIX --dest-cpu=x64
-make
-make install
-cd $SRC_PATH
-rm -rf node-*
-curl http://npmjs.org/install.sh | sh
-npm install -g coffee-script
-
-##
-# Ruby
-##
-banner_echo "Installing Ruby $RUBY_VERSION ..."
-cd $SRC_PATH
-wget http://ftp.ruby-lang.org/pub/ruby/1.9/ruby-$RUBY_VERSION.tar.gz -O $SRC_PATH/ruby-$RUBY_VERSION.tar.gz
-tar -zxvf ruby-$RUBY_VERSION.tar.gz
-cd ruby-$RUBY_VERSION
-./configure --prefix=$PREFIX --disable-install-doc --disable-pthread --with-out-ext=tk,win32ole # --with-readline-dir=/lib --with-ncurses-dir=/lib
-make
-make install
-cd $SRC_PATH
-rm -rf ruby-$RUBY_VERSION*
-gem install bundler --no-ri --no-rdoc
-
-##
 # Tuned thin configuration
 ##
 mkdir -p /var/log/thin
@@ -302,8 +287,8 @@ socket: /tmp/thin.sock
 pid: /var/run/thin.pid
 log: /var/log/thin/thin.log
 servers: $SYSTEM_CORES
-max_conns: $(($SYSTEM_FD_MAXSIZE / $SYSTEM_CORES))
-max_persistent_conns: 512
+max_conns: $(($SYSTEM_FD_MAXSIZE / $SYSTEM_CORES / 2));
+max_persistent_conns: $(($SYSTEM_FD_MAXSIZE / $SYSTEM_CORES / 2 / 2));
 timeout: 60
 chdir: /data/www/application/production/current
 environment: production

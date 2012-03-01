@@ -251,12 +251,12 @@ cat > $PREFIX/conf/nginx.conf << EOF
 user www-data www-data;
 pid /var/run/nginx.pid;
 worker_processes $SYSTEM_CORES;
-worker_rlimit_nofile $SYSTEM_FD_MAXSIZE;
+worker_rlimit_nofile $(($SYSTEM_FD_MAXSIZE / 2));
 
 events {
   use epoll;
-  epoll_events $SYSTEM_FD_MAXSIZE;
-  worker_connections $(($SYSTEM_FD_MAXSIZE / $SYSTEM_CORES));
+  epoll_events $(($SYSTEM_FD_MAXSIZE / 2));
+  worker_connections $(($SYSTEM_FD_MAXSIZE / $SYSTEM_CORES / 2));
 }
 
 http {
@@ -267,7 +267,7 @@ http {
   
   passenger_root $PREFIX/passenger;
   passenger_ruby $PREFIX/bin/ruby;
-  passenger_max_pool_size $(($SYSTEM_CORES * 8));
+  passenger_max_pool_size $(($SYSTEM_CORES * 4));
   
   server_tokens              off;
   default_type               text/html;
