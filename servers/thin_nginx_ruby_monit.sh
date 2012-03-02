@@ -6,7 +6,6 @@
 # - Imagemagick
 # - Monit
 # - Nginx
-# - Node, NPM and CoffeeScript
 # - Ruby
 # - Bundler
 ##
@@ -126,9 +125,6 @@ aptitude -y install git-core
 
 banner_echo "Installing Nginx $NGINX_VERSION dependencies ..."
 aptitude -y install libpcre3-dev libssl-dev # zlib1g-dev already required by Ruby
-
-banner_echo "Installing Node v0.6.2 dependencies ..."
-aptitude -y install pkg-config
 
 banner_echo "Installing monit $MONIT_VERSION dependencies ..."
 aptitude -y install flex bison
