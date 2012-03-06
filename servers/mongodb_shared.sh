@@ -47,8 +47,9 @@ function banner_echo {
   sleep 3
 }
 
-# Copy resources to SRC_PATH
-mkdir -p $SRC_PATH
+##
+# Resources
+##
 cp -rf resources $SRC_PATH/resources
 
 banner_echo "Updating sources ..."

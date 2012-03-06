@@ -51,19 +51,10 @@ function banner_echo {
   sleep 3
 }
 
-# Copy resources to SRC_PATH
-mkdir -p $SRC_PATH
+##
+# Resources
+##
 cp -rf resources $SRC_PATH/resources
-
-##
-# System settings and updates
-##
-banner_echo "Updating locales ..."
-locale-gen
-LC_CTYPE="en_GB.UTF-8"
-LC_ALL="en_GB.UTF-8"
-LANGUAGE="en_GB.UTF-8"
-LANG="en_GB.UTF-8"
 
 banner_echo "Updating sources and upgrading system ..."
 cat > /etc/apt/sources.list << EOF
