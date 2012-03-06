@@ -46,7 +46,7 @@ if [ ! -n "$MONIT_VERSION" ]; then
 fi
 
 if [ ! -n "$NGINX_VERSION" ]; then
-  NGINX_VERSION="1.0.12"
+  NGINX_VERSION="1.0.13"
 fi
 
 if [ ! -n "$RUBY_VERSION" ]; then
@@ -73,20 +73,6 @@ function banner_echo {
 # Copy resources to SRC_PATH
 mkdir -p $SRC_PATH
 cp -rf resources $SRC_PATH/resources
-
-##
-# System settings and updates
-##
-banner_echo "Updating locales ..."
-locale-gen
-LC_CTYPE="en_GB.UTF-8"
-LC_ALL="en_GB.UTF-8"
-LANGUAGE="en_GB.UTF-8"
-LANG="en_GB.UTF-8"
-
-cat > /etc/default/locale << EOF
-LANG="en_GB.UTF-8"
-EOF
 
 banner_echo "Updating sources and upgrading system ..."
 cat > /etc/apt/sources.list << EOF
