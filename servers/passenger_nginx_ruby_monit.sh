@@ -222,6 +222,8 @@ mkdir -p $PREFIX/sites-enabled
 mkdir -p /var/tmp/nginx
 mkdir -p /var/tmp/nginx/body
 mkdir -p /var/tmp/nginx/proxy
+mkdir -p /var/tmp/nginx/uwsgi
+mkdir -p /var/tmp/nginx/scgi
 
 ##
 # Nginx init and logrotate
