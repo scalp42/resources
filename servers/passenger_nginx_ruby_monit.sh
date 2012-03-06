@@ -188,22 +188,24 @@ rake nginx RELEASE=yes
 cd $SRC_PATH
 tar -zxvf nginx-$NGINX_VERSION.tar.gz
 cd nginx-$NGINX_VERSION
-./configure --with-cpu-opt=amd64                              \
-            --prefix=$PREFIX                                  \
-            --user=www-data --group=www-data                  \
-            --http-log-path=/var/log/nginx/access.log         \
-            --error-log-path=/var/log/nginx/error.log         \
-            --pid-path=/var/run/nginx.pid                     \
-            --lock-path=/var/lock/nginx.lock                  \
-            --http-client-body-temp-path=/var/tmp/nginx/body  \
-            --http-proxy-temp-path=/var/tmp/nginx/proxy       \
-            --with-http_ssl_module                            \
-            --with-http_gzip_static_module                    \
-            --without-poll_module                             \
-            --without-select_module                           \
-            --without-http_charset_module                     \
-            --without-http_empty_gif_module                   \
-            --without-http_fastcgi_module                     \
+./configure --with-cpu-opt=amd64                             \
+            --prefix=$PREFIX                                 \
+            --user=www-data --group=www-data                 \
+            --http-log-path=/var/log/nginx/access.log        \
+            --error-log-path=/var/log/nginx/error.log        \
+            --pid-path=/var/run/nginx.pid                    \
+            --lock-path=/var/lock/nginx.lock                 \
+            --http-client-body-temp-path=/var/tmp/nginx/body \
+            --http-proxy-temp-path=/var/tmp/nginx/proxy      \
+            --http-uwsgi-temp-path=/var/tmp/nginx/uwsgi      \
+            --http-scgi-temp-path=/var/tmp/nginx/scgi        \
+            --with-http_ssl_module                           \
+            --with-http_gzip_static_module                   \
+            --without-poll_module                            \
+            --without-select_module                          \
+            --without-http_charset_module                    \
+            --without-http_empty_gif_module                  \
+            --without-http_fastcgi_module                    \
             --add-module=$PREFIX/passenger/ext/nginx
 make
 make install
