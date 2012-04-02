@@ -8,8 +8,6 @@
 # - Imagemagick
 # - Monit
 # - Nginx
-# - Node
-# - Less
 ##
 
 if [ ! -n "$PREFIX" ]; then
@@ -29,7 +27,7 @@ if [ ! -n "$NGINX_VERSION" ]; then
 fi
 
 if [ ! -n "$PHP_VERSION" ]; then
-  PHP_VERSION="5.4.0"
+  PHP_VERSION="5.3.10"
 fi
 
 if [ ! -n "$SYSTEM_FD_MAXSIZE" ]; then
