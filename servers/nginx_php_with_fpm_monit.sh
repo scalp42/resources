@@ -236,7 +236,6 @@ tar -zxvf php-$PHP_VERSION.tar.gz
 cd php-$PHP_VERSION
 ./configure --prefix=$PREFIX --with-libdir=/lib64 \
             --with-pear=$PREFIX --with-mysql  \
-            --with-fpm-conf=$PREFIX/conf/php-fpm.conf \
             --disable-debug --enable-inline-optimization \
             --enable-fpm \
             --with-openssl=/usr --with-openssl-dir=/usr \
