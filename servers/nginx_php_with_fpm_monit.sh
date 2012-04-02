@@ -149,6 +149,7 @@ cd nginx-$NGINX_VERSION
 make
 make install
 cd $SRC_PATH
+rm -rf nginx-$NGINX_VERSION*
 
 ##
 # Nginx directories
