@@ -31,6 +31,10 @@ if [ ! -n "$PHP_VERSION" ]; then
   PHP_VERSION="5.4.0"
 fi
 
+if [ ! -n "$IMAGICK_VERSION" ]; then
+  IMAGICK_VERSION="3.1.0RC1"
+fi
+
 if [ ! -n "$SYSTEM_FD_MAXSIZE" ]; then
   SYSTEM_FD_MAXSIZE=$(more /proc/sys/fs/file-max*)
 fi
@@ -79,7 +83,7 @@ apt-get -y upgrade
 ##
 
 banner_echo "Installing php dependencies ..."
-aptitude -y install build-essential libxml2-dev libcurl4-openssl-dev libmcrypt-dev libltdl-dev libevent-dev
+aptitude -y install build-essential libxml2-dev libcurl4-openssl-dev libmcrypt-dev libltdl-dev libevent-dev autoconf
 
 banner_echo "Installing nginx dependencies ..."
 aptitude -y install libpcre3-dev libssl-dev zlib1g-dev
@@ -231,7 +235,6 @@ cd $SRC_PATH
 wget http://www.php.net/get/php-$PHP_VERSION.tar.gz/from/this/mirror -O $SRC_PATH/php-$PHP_VERSION.tar.gz
 tar -zxvf php-$PHP_VERSION.tar.gz
 cd php-$PHP_VERSION
-cp -f php.ini-production $PREFIX/lib/php.ini
 ./configure --prefix=$PREFIX --with-libdir=/lib64 \
             --with-mysql=mysqlnd --with-mysqli=mysqlnd --with-pdo-mysql=mysqlnd \
             --disable-debug --enable-inline-optimization \
@@ -252,11 +255,16 @@ rm -rf php-$PHP_VERSION*
 ##
 # PHP directories
 ##
+banner_echo "Setting up php-fpm init and logrotate ..."
 mkdir -p /var/log/php-fpm
-
 cp -f resources/init.d/php-fpm /etc/init.d/php-fpm
+cp -f resources/logrotate/php-fpm /etc/logrotate.d/php-fpm
 chmod +x /etc/init.d/php-fpm
 
+##
+# PHP-FPM config
+##
+banner_echo "Generating tuned php-fpm config ..."
 cat > $PREFIX/conf/php-fpm.conf << EOF
 pid                         = /var/run/php-fpm.pid
 error_log                   = /var/log/php-fpm/error.log
@@ -280,8 +288,144 @@ rlimit_core                 = $SYSTEM_FD_MAXSIZE
 EOF
 
 ##
+# PHP ini
+##
+banner_echo "Generating tuned example php.ini for php-$PHP_VERSION ..."
+cat > $PREFIX/lib/php.ini << EOF
+[hardware specific]
+rlimit_files                   = $SYSTEM_FD_MAXSIZE
+zlib.output_compression_level  = 4                  ; decrease if it eats too much cpu
+output_buffering               = Off                ; on if compression eats too much cpu
+zlib.output_compression        = On                 ; off if output_buffering is on
+
+[PHP]
+expose_php               = Off
+short_open_tag           = Off
+post_max_size            = 8M
+ignore_user_abort        = Off
+variables_order          = \"EGPCS\"
+request_order            = \"GP\"
+register_argc_argv       = Off
+auto_globals_jit         = On
+allow_url_fopen          = Off
+allow_url_include        = Off
+enable_dl                = Off
+serialize_precision      = 100
+implicit_flush           = Off
+memory_limit             = 64M
+enable_post_data_reading = 1 ; see http://se.php.net/manual/en/ini.core.php#ini.enable-post-data-reading
+
+[cgi]
+fastcgi.logging        = 1
+
+[security]
+disable_functions = \"system,exec,shell_exec,escapeshellcmd,popen,pcntl_exec\"
+disable_classes   = \"\"
+
+[upload]
+file_uploads        = On
+upload_tmp_dir      = \"/tmp/php\"
+upload_max_filesize = 5M
+max_file_uploads    = 10
+
+[logging]
+error_reporting        = E_ALL & ~E_DEPRECATED
+error_log              = \"/var/log/php/error.log\"
+display_errors         = Off
+display_startup_errors = Off
+log_errors             = Off
+log_errors_max_len     = 1024
+ignore_repeated_errors = Off
+ignore_repeated_source = Off
+report_memleaks        = Off
+track_errors           = Off
+html_errors            = Off
+
+[timeout]
+max_execution_time     = 0
+
+[localization]
+date.timezone   = Europe/Stockholm
+default_charset = \"UTF-8\"
+
+[extensions]
+extension_dir = \"$PREFIX/lib/php/extensions/no-debug-non-zts-20100525\"
+extension     = imagick.so
+;extension     = mongo.so
+;extension     = xcache.so
+;extension     = memcached.so
+;extension     = newrelic.so
+
+;[mongo]
+;mongo.native_long      = false
+;mongo.long_as_object   = false
+;mongo.default_host     = 127.0.0.1
+;mongo.default_port     = 27017
+;mongo.auto_reconnect   = true
+;mongo.allow_persistent = false
+;mongo.chunk_size       = 262144
+;mongo.cmd              = \"$\"
+;mongo.utf8             = 1
+;mongo.allow_empty_keys = false
+
+;[xcache]
+;xcache.cacher                 = On
+;xcache.size                   = 0
+;xcache.count                  = 4
+;xcache.slots                  = 8k
+;xcache.ttl                    = 0
+;xcache.gc_interval            = 0
+;xcache.readonly_protection    = Off
+;xcache.mmap_path              = \"/dev/zero\"
+;xcache.optimizer              = Off
+;xcache.stat                   = Off
+;xcache.coverager              = Off
+;xcache.test                   = Off
+;xcache.shm_scheme             = \"mmap\"
+
+;[newrelic]
+;newrelic.appname                            = RobertBrewitz
+;newrelic.enabled                            = 1
+;newrelic.logfile                            = \"/var/log/newrelic/php_agent.log\"
+;newrelic.loglevel                           = info
+;newrelic.browser_monitoring.auto_instrument = 1
+;newrelic.transaction_tracer.top100          = 1
+;newrelic.framework                          = \"cakephp\"
+
+;[session]
+;session.save_handler             = memcached
+;session.save_path                = some.other.servers.ip:port
+;;
+; http://se.php.net/manual/en/session.configuration.php#ini.session.upload-progress.enabled
+;;
+;session.upload_progress.enabled  = 
+;session.upload_progress.cleanup  = 
+;session.upload_progress.prefix   = 
+;session.upload_progress.name     = 
+;session.upload_progress.freq     = 
+;session.upload_progress.min_freq = 
+EOF
+
+##
+# ImageMagick PHP drivers
+##
+banner_echo "Installing php drivers for imagemagick ..."
+cd $SRC_PATH
+wget http://pecl.php.net/get/imagick-$IMAGICK_VERSION.tgz -O $SRC_PATH/imagick-$IMAGICK_VERSION.tar.gz
+tar -zxvf imagick-$IMAGICK_VERSION.tar.gz
+cd imagick-$IMAGICK_VERSION
+phpize
+./configure --prefix=$PREFIX
+make
+make install
+cd $SRC_PATH
+rm -rf imagick-$IMAGICK_VERSION*
+
+##
 # Cleanup
 ##
 banner_echo "Cleaning up installation files ..."
 cd $SRC_PATH
 rm -rf resources
+
+banner_echo "Done!"
