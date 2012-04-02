@@ -8,6 +8,7 @@
 # - Imagemagick
 # - Monit
 # - Nginx
+# - PHP
 ##
 
 if [ ! -n "$PREFIX" ]; then

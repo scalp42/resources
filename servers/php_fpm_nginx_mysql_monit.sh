@@ -8,6 +8,7 @@
 # - Imagemagick
 # - Monit
 # - Nginx
+# - PHP with mysql drivers
 ##
 
 if [ ! -n "$PREFIX" ]; then
