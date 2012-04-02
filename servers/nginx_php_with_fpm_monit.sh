@@ -40,6 +40,8 @@ if [ ! -n "$SYSTEM_CORES" ]; then
   SYSTEM_CORES=$(cat /proc/cpuinfo | grep processor | wc -l)
 fi
 
+export LC_CTYPE="en_US.UTF-8"
+
 function banner_echo {
   echo ""
   echo "##"
@@ -48,6 +50,8 @@ function banner_echo {
   echo ""
   sleep 3
 }
+
+cp -rf resources $SRC_PATH/resources
 
 banner_echo "Updating sources and upgrading system ..."
 cat > /etc/apt/sources.list << EOF
@@ -235,6 +239,7 @@ tar -zxvf php-$PHP_VERSION.tar.gz
 cd php-$PHP_VERSION
 ./configure --prefix=$PREFIX --with-libdir=/lib64 \
             --with-pear=$PREFIX \
+            --with-fpm-conf=$PREFIX/conf/php-fpm.conf \
             --disable-debug --enable-inline-optimization \
             --enable-fpm \
             --with-openssl=/usr --with-openssl-dir=/usr \
@@ -251,13 +256,13 @@ make install
 cd $SRC_PATH
 rm -rf php-$PHP_VERSION
 
-cat > /usr/local/etc/php-fpm.conf << EOF
+cat > $PREFIX/conf/php-fpm.conf << EOF
 pid                         = /var/run/php-fpm.pid
 error_log                   = /var/log/php-fpm/error.log
 log_level                   = notice
 emergency_restart_threshold = 16
-emergency_restart_interval  = 8s
-process_control_timeout     = 10s
+emergency_restart_interval  = 0
+process_control_timeout     = 0
 daemonize                   = yes
 
 [default]
@@ -267,12 +272,10 @@ pm.max_children             = $(($SYSTEM_CORES * 4))
 pm.max_requests             = $(($SYSTEM_FD_MAXSIZE / $SYSTEM_CORES / 4))
 pm                          = static
 listen                      = /var/run/php-fpm.sock
-listen.backlog              = 4096
 listen.allowed_clients      = 127.0.0.1
 user                        = www-data
 group                       = www-data
 rlimit_core                 = $SYSTEM_FD_MAXSIZE
-request_terminate_timeout   = 5s
 EOF
 
 ##
