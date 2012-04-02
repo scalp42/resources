@@ -194,10 +194,6 @@ http {
   tcp_nopush        off;
   keepalive_timeout 65;
   
-  passenger_root $PREFIX/passenger;
-  passenger_ruby $PREFIX/bin/ruby;
-  passenger_max_pool_size $(($SYSTEM_CORES * 4));
-  
   server_tokens              off;
   default_type               text/html;
   include                    $PREFIX/conf/mime.types;
