@@ -257,6 +257,9 @@ make install
 cd $SRC_PATH
 rm -rf php-$PHP_VERSION
 
+cp -f resources/init.d/php-fpm /etc/init.d/php-fpm
+chmod +x /etc/init.d/php-fpm
+
 cat > $PREFIX/conf/php-fpm.conf << EOF
 pid                         = /var/run/php-fpm.pid
 error_log                   = /var/log/php-fpm/error.log
