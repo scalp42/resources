@@ -253,6 +253,11 @@ make install
 cd $SRC_PATH
 rm -rf php-$PHP_VERSION
 
+##
+# PHP directories
+##
+mkdir -p /var/log/php-fpm
+
 cp -f resources/init.d/php-fpm /etc/init.d/php-fpm
 chmod +x /etc/init.d/php-fpm
 
