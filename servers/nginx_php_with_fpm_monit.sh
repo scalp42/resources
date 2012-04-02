@@ -235,7 +235,7 @@ EOF
 banner_echo "Installing PHP $PHP_VERSION ..."
 
 cd $SRC_PATH
-wget http://www.php.net/get/php-$PHP_VERSION.tar.gz/from/a/mirror -O $SRC_PATH/php-$PHP_VERSION.tar.gz
+wget http://www.php.net/get/php-$PHP_VERSION.tar.gz/from/this/mirror -O $SRC_PATH/php-$PHP_VERSION.tar.gz
 tar -zxvf php-$PHP_VERSION.tar.gz
 cd php-$PHP_VERSION
 ./configure --prefix=$PREFIX --with-libdir=/lib64 \
