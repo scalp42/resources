@@ -225,14 +225,14 @@ EOF
 ##
 # PHP
 ##
-
 banner_echo "Installing PHP $PHP_VERSION ..."
-
 cd $SRC_PATH
 wget http://www.php.net/get/php-$PHP_VERSION.tar.gz/from/this/mirror -O $SRC_PATH/php-$PHP_VERSION.tar.gz
 tar -zxvf php-$PHP_VERSION.tar.gz
 cd php-$PHP_VERSION
+cp -f php.ini-production $PREFIX/lib/php.ini
 ./configure --prefix=$PREFIX --with-libdir=/lib64 \
+            --with-mysql=mysqlnd --with-mysqli=mysqlnd --with-pdo-mysql=mysqlnd \
             --disable-debug --enable-inline-optimization \
             --enable-fpm \
             --with-openssl=/usr --with-openssl-dir=/usr \
@@ -243,8 +243,6 @@ cd php-$PHP_VERSION
             --enable-sockets \
             --with-zlib --with-zlib-dir=/usr \
             --enable-sysvsem --enable-sysvshm
-
-cp -f $SRC_PATH/php-$PHP_VERSION/php.ini-production $PREFIX/lib/php.ini
 make
 make install
 cd $SRC_PATH
