@@ -27,7 +27,7 @@ if [ ! -n "$NGINX_VERSION" ]; then
 fi
 
 if [ ! -n "$PHP_VERSION" ]; then
-  PHP_VERSION="5.3.10"
+  PHP_VERSION="5.4.0"
 fi
 
 if [ ! -n "$SYSTEM_FD_MAXSIZE" ]; then
@@ -233,7 +233,6 @@ wget http://www.php.net/get/php-$PHP_VERSION.tar.gz/from/this/mirror -O $SRC_PAT
 tar -zxvf php-$PHP_VERSION.tar.gz
 cd php-$PHP_VERSION
 ./configure --prefix=$PREFIX --with-libdir=/lib64 \
-            --with-pear=$PREFIX \
             --disable-debug --enable-inline-optimization \
             --enable-fpm \
             --with-openssl=/usr --with-openssl-dir=/usr \
@@ -245,6 +244,7 @@ cd php-$PHP_VERSION
             --with-zlib --with-zlib-dir=/usr \
             --enable-sysvsem --enable-sysvshm
 
+cp -f $SRC_PATH/php-$PHP_VERSION/php.ini-production $PREFIX/lib/php.ini
 make
 make install
 cd $SRC_PATH
