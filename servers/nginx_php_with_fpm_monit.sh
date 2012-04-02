@@ -235,7 +235,7 @@ wget http://www.php.net/get/php-$PHP_VERSION.tar.gz/from/this/mirror -O $SRC_PAT
 tar -zxvf php-$PHP_VERSION.tar.gz
 cd php-$PHP_VERSION
 ./configure --prefix=$PREFIX --with-libdir=/lib64 \
-            --with-pear=$PREFIX \
+            --with-pear=$PREFIX --with-mysql  \
             --with-fpm-conf=$PREFIX/conf/php-fpm.conf \
             --disable-debug --enable-inline-optimization \
             --enable-fpm \

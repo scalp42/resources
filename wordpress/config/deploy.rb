@@ -8,7 +8,7 @@ set :default_stage, "staging"
 set :use_sudo, false
 set :scm_verbose, true
 default_run_options[:pty] = true
-set :copy_exclude, [".git",".gitignore", "wp-config.php", ".htaccess"]
+set :copy_exclude, [".git", ".gitignore", "wp-config.php", ".htaccess"]
 set :deploy_via, :remote_cache
 set :keep_releases, 5
 set :scm, :git
