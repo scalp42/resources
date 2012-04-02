@@ -233,7 +233,7 @@ wget http://www.php.net/get/php-$PHP_VERSION.tar.gz/from/this/mirror -O $SRC_PAT
 tar -zxvf php-$PHP_VERSION.tar.gz
 cd php-$PHP_VERSION
 ./configure --prefix=$PREFIX --with-libdir=/lib64 \
-            --with-pear=$PREFIX --with-mysql  \
+            --with-pear=$PREFIX \
             --disable-debug --enable-inline-optimization \
             --enable-fpm \
             --with-openssl=/usr --with-openssl-dir=/usr \
@@ -248,7 +248,7 @@ cd php-$PHP_VERSION
 make
 make install
 cd $SRC_PATH
-rm -rf php-$PHP_VERSION
+rm -rf php-$PHP_VERSION*
 
 ##
 # PHP directories
