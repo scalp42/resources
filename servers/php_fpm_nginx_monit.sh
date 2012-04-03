@@ -369,21 +369,6 @@ extension     = apc.so
 ;mongo.utf8             = 1
 ;mongo.allow_empty_keys = false
 
-;[xcache]
-;xcache.cacher                 = On
-;xcache.size                   = 0
-;xcache.count                  = 4
-;xcache.slots                  = 8k
-;xcache.ttl                    = 0
-;xcache.gc_interval            = 0
-;xcache.readonly_protection    = Off
-;xcache.mmap_path              = \"/dev/zero\"
-;xcache.optimizer              = Off
-;xcache.stat                   = Off
-;xcache.coverager              = Off
-;xcache.test                   = Off
-;xcache.shm_scheme             = \"mmap\"
-
 ;[newrelic]
 ;newrelic.appname                            = RobertBrewitz
 ;newrelic.enabled                            = 1
