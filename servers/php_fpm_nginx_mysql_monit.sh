@@ -281,8 +281,8 @@ daemonize                   = yes
 [default]
 
 rlimit_files                = $SYSTEM_FD_MAXSIZE
-pm.max_children             = $(($SYSTEM_CORES * 4))
-pm.max_requests             = $(($SYSTEM_FD_MAXSIZE / $SYSTEM_CORES / 4))
+pm.max_children             = $(($SYSTEM_CORES * 2))
+pm.max_requests             = $(($SYSTEM_FD_MAXSIZE / $SYSTEM_CORES / 2))
 pm                          = static
 listen                      = /var/run/php-fpm.sock
 listen.allowed_clients      = 127.0.0.1
