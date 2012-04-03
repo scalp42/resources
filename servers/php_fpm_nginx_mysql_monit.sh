@@ -35,6 +35,10 @@ if [ ! -n "$IMAGICK_VERSION" ]; then
   IMAGICK_VERSION="3.1.0RC1"
 fi
 
+if [ ! -n "$APC_VERSION" ]; then
+  APC_VERSION="3.1.9"
+fi
+
 if [ ! -n "$SYSTEM_FD_MAXSIZE" ]; then
   SYSTEM_FD_MAXSIZE=$(more /proc/sys/fs/file-max*)
 fi
@@ -351,6 +355,7 @@ default_charset = \"UTF-8\"
 [extensions]
 extension_dir = \"$PREFIX/lib/php/extensions/no-debug-non-zts-20100525\"
 extension     = imagick.so
+extension     = apc.so
 ;extension     = mongo.so
 ;extension     = xcache.so
 ;extension     = memcached.so
@@ -420,6 +425,21 @@ make
 make install
 cd $SRC_PATH
 rm -rf imagick-$IMAGICK_VERSION*
+
+##
+# APC
+##
+banner_echo "Installing php drivers for imagemagick ..."
+cd $SRC_PATH
+wget http://pecl.php.net/get/APC-$APC_VERSION.tgz -O $SRC_PATH/APC-$APC_VERSION.tgz
+tar -zxvf APC-$APC_VERSION.tgz
+cd APC-$APC_VERSION
+phpize
+./configure --prefix=$PREFIX
+make
+make install
+cd $SRC_PATH
+rm -rf APC-$APC_VERSION*
 
 ##
 # Cleanup
