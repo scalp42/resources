@@ -355,7 +355,7 @@ default_charset = \"UTF-8\"
 [extensions]
 extension_dir = \"$PREFIX/lib/php/extensions/no-debug-non-zts-20100525\"
 extension     = imagick.so
-extension     = apc.so
+extension     = apc.so ; https://bugs.php.net/bug.php?id=61238
 ;extension     = mongo.so
 ;extension     = xcache.so
 ;extension     = memcached.so
