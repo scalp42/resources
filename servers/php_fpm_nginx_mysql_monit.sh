@@ -8,7 +8,9 @@
 # - Imagemagick
 # - Monit
 # - Nginx
-# - PHP with mysql drivers
+# - PHP with mysql
+# - ImageMagick PHP Drivers
+# - APC PHP Drivers
 ##
 
 if [ ! -n "$PREFIX" ]; then
