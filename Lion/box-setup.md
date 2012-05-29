@@ -34,6 +34,8 @@ For more infromation about homebrew php installer check https://github.com/mxcl/
 
 ``
   brew tap josegonzalez/php
+``
+``
   brew install josegonzalez/php/php54 --with-fpm --with-mysql --with-intl --with-readline
 ``
 
