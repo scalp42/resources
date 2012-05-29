@@ -28,9 +28,13 @@ Download Xcode 3/4 Installer from App Store and run the installer from the appli
 
 ``
   brew install node
-  
+``
+
+``
   curl http://npmjs.org/install.sh | sh
-  
+``
+
+``
   npm install -g coffee-script
 ``
 
@@ -39,7 +43,9 @@ For more infromation about homebrew php installer check https://github.com/mxcl/
 
 ``
   brew tap josegonzalez/php
-  
+``
+
+``
   brew install josegonzalez/php/php54 --with-fpm --with-mysql --with-intl --with-readline
 ``
 
