@@ -109,14 +109,16 @@ apt-get -y upgrade
 # Dependencies
 ##
 banner_echo "Installing Ruby $RUBY_VERSION dependencies ..."
-aptitude -y install build-essential zlib1g-dev libxml2-dev libxslt-dev \
-                    libffi-dev libyaml-dev \
-                    libcurl4-openssl-dev libopenssl-ruby \
-                    ncurses-dev libncurses-ruby \
-                    libreadline-dev libreadline-ruby
+
+aptitude -y install build-essential zlib1g-dev libssl-dev libreadline5-dev libyaml-dev
+                    # build-essential zlib1g-dev libxml2-dev libxslt-dev \
+                    # libffi-dev libyaml-dev libssl-dev \
+                    # libcurl4-openssl-dev libopenssl-ruby \
+                    # ncurses-dev libncurses-ruby \
+                    # libreadline5-dev libreadline-ruby
 
 banner_echo "Installing Nginx $NGINX_VERSION dependencies ..."
-aptitude -y install libpcre3-dev libssl-dev # zlib1g-dev already required by Ruby
+aptitude -y install libpcre3-dev # libssl-dev zlib1g-dev already required by Ruby
 
 banner_echo "Installing Git..."
 aptitude -y install git-core

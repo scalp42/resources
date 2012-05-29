@@ -33,7 +33,8 @@ Download Xcode 3/4 Installer from App Store and run the installer from the appli
 For more infromation about homebrew php installer check https://github.com/mxcl/homebrew/tree/master/Library/Formula or google for more information
 
 ``
-  brew install php --with-fpm --with-mysql --with-intl --with-readline
+  brew tap josegonzalez/php
+  brew install josegonzalez/php/php54 --with-fpm --with-mysql --with-intl --with-readline
 ``
 
 ## Other
