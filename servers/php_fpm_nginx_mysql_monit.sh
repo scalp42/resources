@@ -8,7 +8,9 @@
 # - Imagemagick
 # - Monit
 # - Nginx
-# - PHP with mysql drivers
+# - PHP with mysql
+# - ImageMagick PHP Drivers
+# - APC PHP Drivers
 ##
 
 if [ ! -n "$PREFIX" ]; then
@@ -307,8 +309,8 @@ expose_php               = Off
 short_open_tag           = Off
 post_max_size            = 8M
 ignore_user_abort        = Off
-variables_order          = \"EGPCS\"
-request_order            = \"GP\"
+variables_order          = "EGPCS"
+request_order            = "GP"
 register_argc_argv       = Off
 auto_globals_jit         = On
 allow_url_fopen          = Off
@@ -323,18 +325,18 @@ enable_post_data_reading = 1 ; see http://se.php.net/manual/en/ini.core.php#ini.
 fastcgi.logging        = 1
 
 [security]
-disable_functions = \"system,exec,shell_exec,escapeshellcmd,popen,pcntl_exec\"
-disable_classes   = \"\"
+disable_functions = "system,exec,shell_exec,escapeshellcmd,popen,pcntl_exec"
+disable_classes   = ""
 
 [upload]
 file_uploads        = On
-upload_tmp_dir      = \"/tmp/php\"
+upload_tmp_dir      = "/tmp/php"
 upload_max_filesize = 5M
 max_file_uploads    = 10
 
 [logging]
 error_reporting        = E_ALL & ~E_DEPRECATED
-error_log              = \"/var/log/php/error.log\"
+error_log              = "/var/log/php/error.log"
 display_errors         = Off
 display_startup_errors = Off
 log_errors             = Off
@@ -350,10 +352,10 @@ max_execution_time     = 0
 
 [localization]
 date.timezone   = Europe/Stockholm
-default_charset = \"UTF-8\"
+default_charset = "UTF-8"
 
 [extensions]
-extension_dir = \"$PREFIX/lib/php/extensions/no-debug-non-zts-20100525\"
+extension_dir = "$PREFIX/lib/php/extensions/no-debug-non-zts-20100525"
 extension     = imagick.so
 extension     = apc.so ; https://bugs.php.net/bug.php?id=61238
 ;extension     = mongo.so
@@ -369,18 +371,18 @@ extension     = apc.so ; https://bugs.php.net/bug.php?id=61238
 ;mongo.auto_reconnect   = true
 ;mongo.allow_persistent = false
 ;mongo.chunk_size       = 262144
-;mongo.cmd              = \"$\"
+;mongo.cmd              = "$"
 ;mongo.utf8             = 1
 ;mongo.allow_empty_keys = false
 
 ;[newrelic]
 ;newrelic.appname                            = RobertBrewitz
 ;newrelic.enabled                            = 1
-;newrelic.logfile                            = \"/var/log/newrelic/php_agent.log\"
+;newrelic.logfile                            = "/var/log/newrelic/php_agent.log"
 ;newrelic.loglevel                           = info
 ;newrelic.browser_monitoring.auto_instrument = 1
 ;newrelic.transaction_tracer.top100          = 1
-;newrelic.framework                          = \"cakephp\"
+;newrelic.framework                          = "cakephp"
 
 ;[session]
 ;session.save_handler             = memcached
