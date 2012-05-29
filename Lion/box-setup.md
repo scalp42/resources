@@ -16,8 +16,11 @@ Download Xcode 3/4 Installer from App Store and run the installer from the appli
 
 ``
   bash < <(curl -sk https://rvm.beginrescueend.com/install/rvm)
+  
   rvm install ruby-1.9.2-p290
+  
   rvm 1.9.2 --default
+  
   gem install rails
 ``
 
@@ -25,7 +28,9 @@ Download Xcode 3/4 Installer from App Store and run the installer from the appli
 
 ``
   brew install node
+  
   curl http://npmjs.org/install.sh | sh
+  
   npm install -g coffee-script
 ``
 
@@ -34,8 +39,7 @@ For more infromation about homebrew php installer check https://github.com/mxcl/
 
 ``
   brew tap josegonzalez/php
-``
-``
+  
   brew install josegonzalez/php/php54 --with-fpm --with-mysql --with-intl --with-readline
 ``
 
