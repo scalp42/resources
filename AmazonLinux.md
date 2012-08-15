@@ -1,4 +1,4 @@
-# MongoDB, Raid10, RVM, Ruby-1.9.3-p125
+# MongoDB, Raid10, RVM, Ruby-1.9.3-p194
 
 Currently testing setups on Amazon Linux, documenting progress and findings here.
 
@@ -112,7 +112,9 @@ Make sure you check the EBS device names before attempting this.
 
     sudo yum install -y gcc-c++ patch readline readline-devel zlib zlib-devel libyaml-devel libffi-devel openssl-devel make bzip2 autoconf automake libtool bison iconv-devel
 
-### RVM and ruby-1.9.3-p125
+### RVM and ruby-1.9.3-p194
 
-    curl -L https://get.rvm.io | bash -s stable
-    rvm install ruby-1.9.3-p125
+Need RVM installed as sudo to make it accessible in the unicorn startup script.
+
+    curl -L https://get.rvm.io | sudo bash -s stable
+    sudo rvm install ruby-1.9.3-p194
