@@ -2,25 +2,29 @@
 
 Currently testing setups on Amazon Linux, documenting progress and findings here.
 
-## Install tools
+## Raid10
+
+Make sure you check the EBS device names before attempting this.
+
+### Install tools
 
     yum install mdadm.x86_64
     yum install xfsprogs.x86_64
 
-## Format XFS filesystem for disks
+### Format XFS filesystem for disks
 
     sudo mkfs.xfs /dev/xvdf1 -f
     sudo mkfs.xfs /dev/xvdf2 -f
     sudo mkfs.xfs /dev/xvdf3 -f
     sudo mkfs.xfs /dev/xvdf4 -f
 
-## Create and persist raid10 array
+### Create and persist raid10 array
 
     sudo mdadm --create /dev/md0 --level=10 --chunk=256 --raid-devices=4 /dev/xvdf1 /dev/xvdf2 /dev/xvdf3 /dev/xvdf4
     echo 'DEVICE /dev/xvdf1 /dev/xvdf2 /dev/xvdf3 /dev/xvdf4' | sudo tee -a /etc/mdadm.conf
     sudo mdadm --detail --scan | sudo tee -a /etc/mdadm.conf
 
-## Tune EBS volumes
+### Tune EBS volumes
 
     sudo blockdev --setra 128 /dev/md0
     sudo blockdev --setra 128 /dev/xvdf1
@@ -80,18 +84,18 @@ Currently testing setups on Amazon Linux, documenting progress and findings here
     baseurl=http://downloads-distro.mongodb.org/repo/redhat/os/x86_64
     gpgcheck=0" | sudo tee -a /etc/yum.repos.d/10gen.repo
 
-## Install MongoDB server and sysstat
+### Install MongoDB server and sysstat
 
     sudo yum -y install mongo-10gen-server
     sudo yum -y install sysstat
 
-## Set mongod as owner for MongoDB directories
+### Set mongod as owner for MongoDB directories
 
     sudo chown mongod:mongod /data
     sudo chown mongod:mongod /log
     sudo chown mongod:mongod /journal
 
-## Important configuration options
+### Important configuration options
 
 /etc/mongod.conf
 
