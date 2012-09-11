@@ -106,6 +106,15 @@ Make sure you check the EBS device names before attempting this.
     dbpath=/data
     ...
 
+### Auto start mongod
+
+    sudo chkconfig mongod on
+
+### Start/Stop mongod
+
+    sudo service mongod start
+    sudo service mongod stop
+
 ## Install RVM
 
 ### Dependencies
