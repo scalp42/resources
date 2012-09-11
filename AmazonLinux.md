@@ -127,3 +127,8 @@ Need RVM installed as sudo to make it accessible in the unicorn startup script.
 
     curl -L https://get.rvm.io | sudo bash -s stable
     sudo rvm install ruby-1.9.3-p194
+
+## Install Node
+
+    sudo yum localinstall --nogpgcheck http://nodejs.tchol.org/repocfg/amzn1/nodejs-stable-release.noarch.rpm
+    sudo yum install nodejs-compat-symlinks npm
