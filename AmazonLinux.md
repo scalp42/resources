@@ -8,8 +8,7 @@ Make sure you check the EBS device names before attempting this.
 
 ### Install tools
 
-    yum install mdadm.x86_64
-    yum install xfsprogs.x86_64
+    sudo yum install -y mdadm.x86_64 xfsprogs.x86_64
 
 ### Format XFS filesystem for disks
 
@@ -17,11 +16,13 @@ Make sure you check the EBS device names before attempting this.
     sudo mkfs.xfs /dev/xvdf2 -f
     sudo mkfs.xfs /dev/xvdf3 -f
     sudo mkfs.xfs /dev/xvdf4 -f
+    sudo mkfs.xfs /dev/xvdf5 -f
+    sudo mkfs.xfs /dev/xvdf6 -f
 
 ### Create and persist raid10 array
 
-    sudo mdadm --create /dev/md0 --level=10 --chunk=256 --raid-devices=4 /dev/xvdf1 /dev/xvdf2 /dev/xvdf3 /dev/xvdf4
-    echo 'DEVICE /dev/xvdf1 /dev/xvdf2 /dev/xvdf3 /dev/xvdf4' | sudo tee -a /etc/mdadm.conf
+    sudo mdadm --create /dev/md0 --level=10 --chunk=256 --raid-devices=6 /dev/xvdf1 /dev/xvdf2 /dev/xvdf3 /dev/xvdf4 /dev/xvdf5 /dev/xvdf6
+    echo 'DEVICE /dev/xvdf1 /dev/xvdf2 /dev/xvdf3 /dev/xvdf4 /dev/xvdf5 /dev/xvdf6' | sudo tee -a /etc/mdadm.conf
     sudo mdadm --detail --scan | sudo tee -a /etc/mdadm.conf
 
 ### Tune EBS volumes
@@ -31,6 +32,8 @@ Make sure you check the EBS device names before attempting this.
     sudo blockdev --setra 128 /dev/xvdf2
     sudo blockdev --setra 128 /dev/xvdf3
     sudo blockdev --setra 128 /dev/xvdf4
+    sudo blockdev --setra 128 /dev/xvdf5
+    sudo blockdev --setra 128 /dev/xvdf6
 
 ### Zeroing out our RAID
 
@@ -115,6 +118,25 @@ Make sure you check the EBS device names before attempting this.
     sudo service mongod start
     sudo service mongod stop
 
+### Format and remount when launching instance from AMI with raid10 configuration
+
+I am not sure this is needed, needs more research; But better safe than sorry.
+
+    sudo unlink /data/journal
+    sudo umount /data
+    sudo umount /log
+    sudo umount /journal
+    sudo mkfs.xfs /dev/vg0/data -f
+    sudo mkfs.xfs /dev/vg0/log -f
+    sudo mkfs.xfs /dev/vg0/journal -f
+    sudo mount /data
+    sudo mount /log
+    sudo mount /journal
+    sudo ln -s /journal /data/journal
+    sudo chown mongod:mongod /data
+    sudo chown mongod:mongod /log
+    sudo chown mongod:mongod /journal
+
 ## Install RVM
 
 ### Dependencies
@@ -131,4 +153,4 @@ Need RVM installed as sudo to make it accessible in the unicorn startup script.
 ## Install Node
 
     sudo yum localinstall --nogpgcheck http://nodejs.tchol.org/repocfg/amzn1/nodejs-stable-release.noarch.rpm
-    sudo yum install nodejs-compat-symlinks npm
+    sudo yum install -y nodejs-compat-symlinks npm
