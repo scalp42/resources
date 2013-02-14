@@ -10,11 +10,30 @@ gem 'rails', '3.2.12'
 ##
 # Database
 gem 'mongoid', '3.1.0'
-gem 'paperclip', '3.1.4'
-gem 'mongoid-paperclip', '0.0.7', require: 'mongoid_paperclip'
 
-gem 'haml', '3.1.6'
-gem 'simple_form', '2.0.2'
+##
+# Authentication
+# gem 'devise', '2.2.3'
+# gem 'devise-encryptable', '0.1.1'
+
+##
+# Views
+# gem 'haml', '3.1.6'
+# gem 'simple_form', '2.0.2'
+
+##
+# Uploads & Assets
+# gem 'paperclip', '3.4.0'
+# gem 'mongoid-paperclip', '0.0.8', require: 'mongoid_paperclip'
+# gem 'asset_sync', '0.5.4'
+# gem 'aws-sdk', '1.8.1.3'
+
+##
+# Server and deployment
+# gem 'unicorn', '4.6.0'
+# gem 'capistrano', '2.14.2'
+# gem 'capistrano-ext', '1.2.1'
+# gem 'whenever', '0.8.2', require: false
 
 group :assets do
   gem 'coffee-rails', '3.2.2'
@@ -25,7 +44,6 @@ group :assets do
 end
 
 group :development do
-  gem 'asset_sync', '0.5.4'
   gem 'ruby-debug19', '0.11.6'
   gem 'therubyracer', '0.11.3', platforms: :ruby
 end
@@ -39,7 +57,7 @@ group :test do
   gem 'database_cleaner'
   gem 'spork'
   gem 'guard-spork'
-  gem 'cucumber-rails', :require => false
+  gem 'cucumber-rails', require: false
   gem 'guard-cucumber'
 end
 
@@ -74,8 +92,8 @@ git :commit => "-m \"Initial commit\""
 run "bundle install"
 run "rails g mongoid:config"
 run "rails g rspec:install"
-run "mkdir spec/support spec/models spec/routing"
-run "touch spec/support/.gitkeep spec/models/.gitkeep spec/routing/.gitkeep"
+run "mkdir spec/support spec/models spec/routing features/support features/step_definitions"
+run "touch spec/support/.gitkeep spec/models/.gitkeep spec/routing/.gitkeep features/step_definitions/.gitkeep"
 run "guard init rspec"
 run "spork --bootstrap"
 run "guard init spork"
@@ -160,6 +178,30 @@ end
 
 Spork.each_run do
   FactoryGirl.reload
+end
+
+END
+
+file "features/support/env.rb" <<-END
+require 'rubygems'
+require 'spork'
+
+Spork.prefork do
+  require 'cucumber/rails'
+  Capybara.default_selector = :css
+end
+
+Spork.each_run do
+  ActionController::Base.allow_rescue = false
+  
+  begin
+    DatabaseCleaner.orm = 'mongoid'
+    DatabaseCleaner.strategy = :truncation
+  rescue NameError
+    raise "You need to add database_cleaner to your Gemfile (in the :test group) if you wish to use it."
+  end
+  
+  Cucumber::Rails::Database.javascript_strategy = :truncation
 end
 
 END
