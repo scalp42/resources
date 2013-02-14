@@ -148,6 +148,7 @@ I am not sure this is needed, needs more research; But better safe than sorry.
 Need RVM installed as sudo to make it accessible in the unicorn startup script.
 
     curl -L https://get.rvm.io | sudo bash -s stable
+    sudo reboot # might be needed
     sudo rvm install ruby-1.9.3-p194
 
 ## Install Node
