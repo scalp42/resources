@@ -1,0 +1,14 @@
+/home/ec2-user/applications/application/production/shared/log/*.log {
+  daily
+  dateext
+  missingok
+  rotate 7
+  compress
+  delaycompress
+  notifempty
+
+  lastaction
+    pid=/home/ec2-user/applications/application/production/shared/pids/unicorn.pid
+    test -s $pid && kill -USR1 "$(cat $pid)"
+  endscript
+}

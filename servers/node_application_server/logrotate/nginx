@@ -1,0 +1,13 @@
+/var/log/nginx/*.log {
+  daily                         # rotate the logfile(s) daily
+  dateext                       # adds extension like YYYYMMDD instead of simply adding a number
+  missingok                     # If log file is missing, go on to next one without issuing an error msg
+  rotate 7                      # Save logfiles for the last 7 days
+  compress                      # Old versions of log files are compressed with gzip
+  delaycompress                 # Postpone compression of the previous log file to the next rotation cycle
+  notifempty                    # Do not rotate the log if it is empty
+
+  postrotate
+    [ ! -f /var/run/nginx.pid ] || kill -USR1 `cat /var/run/nginx.pid`
+  endscript
+}

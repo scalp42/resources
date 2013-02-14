@@ -182,7 +182,7 @@ end
 
 END
 
-file "features/support/env.rb" <<-END
+file "features/support/env.rb", <<-END
 require 'rubygems'
 require 'spork'
 
