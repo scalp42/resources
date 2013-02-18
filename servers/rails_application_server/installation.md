@@ -8,6 +8,10 @@
 
     sudo yum install -y gcc-c++ patch readline readline-devel zlib zlib-devel libyaml-devel libffi-devel openssl-devel make bzip2 autoconf automake libtool bison iconv-devel libxml2-devel.x86_64 libxslt-devel.x86_64
 
+## Dependencies if the application uses curl
+
+    sudo yum install libcurl-devel.x86_64 libcurl-devel.x86_64
+
 ## Nginx and git
 
     sudo yum install -y git-core nginx
